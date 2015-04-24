@@ -1,0 +1,28 @@
+﻿Build started 24/04/2015 15:24:59.
+     1>Project "C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\GL_GLEW_GLFW_TEMPLATE.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\include /Z7 /nologo /W4 /WX- /MP /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /RTC1 /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\\" /Fd"C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt src\main.cpp
+         main.cpp
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec2.hpp(64): warning C4201: nonstandard extension used : nameless struct/union
+                 c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec2.hpp(242) : see reference to class template instantiation 'glm::tvec2<T,P>' being compiled
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec2.hpp(65): warning C4201: nonstandard extension used : nameless struct/union
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec2.hpp(66): warning C4201: nonstandard extension used : nameless struct/union
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec3.hpp(64): warning C4201: nonstandard extension used : nameless struct/union
+                 c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec3.hpp(264) : see reference to class template instantiation 'glm::tvec3<T,P>' being compiled
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec3.hpp(65): warning C4201: nonstandard extension used : nameless struct/union
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec3.hpp(66): warning C4201: nonstandard extension used : nameless struct/union
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec4.hpp(118): warning C4201: nonstandard extension used : nameless struct/union
+                 c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec4.hpp(364) : see reference to class template instantiation 'glm::tvec4<T,P>' being compiled
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec4.hpp(119): warning C4201: nonstandard extension used : nameless struct/union
+     1>c:\users\tengel\dropbox\tg\terrain\gl_glew_glfw__glm_template\include\glm\detail/type_vec4.hpp(120): warning C4201: nonstandard extension used : nameless struct/union
+     1>src\main.cpp(23): warning C4100: 'error' : unreferenced formal parameter
+     1>src\main.cpp(30): warning C4100: 'mods' : unreferenced formal parameter
+     1>src\main.cpp(30): warning C4100: 'scancode' : unreferenced formal parameter
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\HeightMapVis.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\lib glfw3.lib glew32.lib glu32.lib opengl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\HeightMapVis.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\HeightMapVis.lib" /MACHINE:X86 C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\main.obj
+         GL_GLEW_GLFW_TEMPLATE.vcxproj -> C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\\Debug\HeightMapVis.exe
+     1>Done Building Project "C:\Users\tengel\Dropbox\TG\Terrain\GL_GLEW_GLFW__GLM_TEMPLATE\GL_GLEW_GLFW_TEMPLATE.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.23
