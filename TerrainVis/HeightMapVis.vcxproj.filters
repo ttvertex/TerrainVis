@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\TextureManager.cpp">
+      <Filter>tgalib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="tgalib">
+      <UniqueIdentifier>{24c4b2f5-b773-49ec-8d0c-dad226717ac6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Buffers">
+      <UniqueIdentifier>{08365aae-4353-4bd2-ae08-53eb524786cd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\TextureManager.h">
+      <Filter>tgalib</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -13,11 +13,12 @@
 #include <glm\glm.hpp>
 
 //Include the standard C++ headers  
-#include <stdio.h>  
-#include <stdlib.h>
-#include<iostream>
+#include <iostream>
 #include <cassert>
 
+#include "TextureManager.h"
+
+using namespace std;
 
 //Define an error callback  
 void error_callback(int error, const char* description)
@@ -25,7 +26,7 @@ void error_callback(int error, const char* description)
 	fputs(description, stderr);
 	_fgetchar();
 }
-
+	
 //Define the key input callback  
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -81,11 +82,38 @@ int main(void)
 	//Set a background color  
 	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 
+	if (TextureManager::Inst()->LoadTexture("resources\\terrain.jpg", 1)){
+		cout << "Image loaded!" << endl;
+	}
+	else{
+		cout << "Problem loading image!" << endl;
+	}
+
 	//Main Loop  
 	do
 	{
+		float side = 1.0f;
 		//Clear color buffer  
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glEnable(GL_TEXTURE_2D);
+		
+		if (!TextureManager::Inst()->BindTexture(1)){
+			cout << "Error binding!" << endl;
+		}
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2f(-side , -side);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex2f(side, -side);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex2f(side, side);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex2f(-side, side); 
+		glEnd();
+
+		glDisable(GL_TEXTURE_2D);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
@@ -100,5 +128,6 @@ int main(void)
 	//Finalize and clean up GLFW  
 	glfwTerminate();
 
+	system("pause");
 	exit(EXIT_SUCCESS);
 }
