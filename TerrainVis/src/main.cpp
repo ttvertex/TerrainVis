@@ -82,7 +82,7 @@ int main(void)
 	//Set a background color  
 	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 
-	if (TextureManager::Inst()->LoadTexture("resources\\terrain.jpg", 1)){
+	if (TextureManager::Inst()->LoadTexture("terrain.jpg", 1)){
 		cout << "Image loaded!" << endl;
 	}
 	else{

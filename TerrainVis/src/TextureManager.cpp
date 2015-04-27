@@ -41,6 +41,10 @@ TextureManager::~TextureManager()
 	m_inst = 0;
 }
 
+int mat2vecIndex(int r, int c, int nc){
+	return (r * nc + c);
+}
+
 bool TextureManager::LoadTexture(const char* filename, const unsigned int texID, GLenum image_format, GLint internal_format, GLint level, GLint border)
 {
 	//image format
@@ -82,6 +86,24 @@ bool TextureManager::LoadTexture(const char* filename, const unsigned int texID,
 	//if this texture ID is in use, unload the current texture
 	if(m_texID.find(texID) != m_texID.end())
 		glDeleteTextures(1, &(m_texID[texID]));
+
+	cout << "(" << width << "," << height << ")" << endl;
+	//compute vertex and normals
+
+	for (int i = 0; i < width; i++){
+		for (int j = 0; j < height; j++){
+			// four corners' vertex
+			vec3 v00(i, bits[mat2vecIndex(i, j, width)] / 255.0f, j); // x, height, z
+			vec3 v10(i, bits[mat2vecIndex(i + 1, j, width)] / 255.0f, j); // x, height, z
+			vec3 v11(i, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f, j); // x, height, z
+			vec3 v01(i, bits[mat2vecIndex(i, j + 1, width)] / 255.0f, j); // x, height, z
+
+			vec3 n1 = cross(v00 - v10, v00 - v11);
+			vec3 n2 = cross(v01 - v00, v01 - v11);
+			
+			//TODO index
+		}
+	}
 
 	//generate an OpenGL texture ID for this texture
 	glGenTextures(1, &gl_texID);
@@ -148,4 +170,8 @@ void TextureManager::UnloadAllTextures()
 
 	//clear the texture map
 	m_texID.clear();
+}
+
+heightmap_t TextureManager::genMesh(){
+	return hmap;
 }

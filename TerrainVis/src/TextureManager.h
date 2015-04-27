@@ -8,11 +8,23 @@
 
 #ifndef TextureManager_H
 #define TextureManager_H
-
+#include <vector>
+#include <iostream>
 #include <windows.h>
 #include <gl/gl.h>
 #include "FreeImage.h"
 #include <map>
+#include "glm\glm.hpp"
+
+using namespace std;
+using namespace glm;
+
+typedef struct {
+	std::vector<vec3>* vertices;
+	std::vector<vec3>* normals;
+	int h, w;
+
+}heightmap_t;
 
 class TextureManager
 {
@@ -39,6 +51,8 @@ public:
 	//free all texture memory
 	void UnloadAllTextures();
 
+	heightmap_t genMesh();
+
 protected:
 	TextureManager();
 	TextureManager(const TextureManager& tm);
@@ -46,6 +60,8 @@ protected:
 
 	static TextureManager* m_inst;
 	std::map<unsigned int, GLuint> m_texID;
+	heightmap_t hmap;
+
 };
 
 #endif
