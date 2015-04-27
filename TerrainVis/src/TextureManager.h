@@ -20,8 +20,8 @@ using namespace std;
 using namespace glm;
 
 typedef struct {
-	std::vector<vec3>* vertices;
-	std::vector<vec3>* normals;
+	std::vector<vec3> vertices;
+	std::vector<vec3> normals;
 	int h, w;
 
 }heightmap_t;

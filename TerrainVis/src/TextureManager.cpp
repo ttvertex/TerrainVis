@@ -89,21 +89,42 @@ bool TextureManager::LoadTexture(const char* filename, const unsigned int texID,
 
 	cout << "(" << width << "," << height << ")" << endl;
 	//compute vertex and normals
-
-	for (int i = 0; i < width; i++){
-		for (int j = 0; j < height; j++){
+	vector<vec3> vertices;
+	vector<vec3> normals;
+	for (int i = 0; i < width -1; i++){
+		for (int j = 0; j < height-1; j++){
 			// four corners' vertex
-			vec3 v00(i, bits[mat2vecIndex(i, j, width)] / 255.0f, j); // x, height, z
-			vec3 v10(i, bits[mat2vecIndex(i + 1, j, width)] / 255.0f, j); // x, height, z
-			vec3 v11(i, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f, j); // x, height, z
-			vec3 v01(i, bits[mat2vecIndex(i, j + 1, width)] / 255.0f, j); // x, height, z
+			//t1
+			vec3 v00t1(i, bits[mat2vecIndex(i, j, width)] / 255.0f, j); // x, height, z
+			vec3 v10t1(i + 1, bits[mat2vecIndex(i + 1, j, width)] / 255.0f, j); // x, height, z
+			vec3 v11t1(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f, j + 1); // x, height, z
+			//t2
+			vec3 v11t2(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f, j + 1); // x, height, z
+			vec3 v01t2(i, bits[mat2vecIndex(i, j + 1, width)] / 255.0f, j + 1); // x, height, z
+			vec3 v00t2(i, bits[mat2vecIndex(i, j, width)] / 255.0f, j); // x, height, z
 
-			vec3 n1 = cross(v00 - v10, v00 - v11);
-			vec3 n2 = cross(v01 - v00, v01 - v11);
-			
-			//TODO index
+			vec3 n1 = cross(v00t1 - v10t1, v00t1 - v11t1);
+			vec3 n2 = cross(v01t2 - v00t2, v01t2 - v11t2);
+			//t1
+			vertices.push_back(v00t1);
+			vertices.push_back(v10t1);
+			vertices.push_back(v11t1);
+			//t2
+			vertices.push_back(v11t2);
+			vertices.push_back(v01t2);
+			vertices.push_back(v00t2);
+
+			normals.push_back(n1);
+			normals.push_back(n2);
 		}
 	}
+	hmap.normals = normals;
+	hmap.vertices = vertices;
+	hmap.w = width;
+	hmap.h = height;
+
+	cout << "vertexes: " << vertices.size() << endl;
+	cout << "triangles/normals: " << normals.size() << endl;
 
 	//generate an OpenGL texture ID for this texture
 	glGenTextures(1, &gl_texID);
