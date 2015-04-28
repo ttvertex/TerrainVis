@@ -18,15 +18,15 @@
 #include <iostream>
 #include <cassert>
 
-#include "TextureManager.h"
+#include "HeightMap.h"
 
 using namespace std;
 
 mat4 g_Modelview = glm::mat4();
 
-vec4 g_Center = vec4(0,10,0,1);
-vec4 g_Up = vec4(1,0,0,1); // y is up
-vec4 g_Eye = vec4(0, -1, 0, 1);
+vec4 g_Center = vec4(0.0f,50.0f,0.0f,1.0f);
+vec4 g_Up = vec4(0.0f, 1.0f, 1.0f, 1.0f); // y is up
+vec4 g_Eye = vec4(0.0f, -1.0f, 0.0f, 1.0f);
 
 //Define an error callback  
 void error_callback(int error, const char* description)
@@ -107,7 +107,7 @@ void SetupProjection()
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60.0, 1, 0.01, 200);
+	gluPerspective(60.0, 1, 0.01, 500);
 
 }
 
@@ -162,21 +162,23 @@ int main(void)
 	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 	SetupLighting();
 
-	if (TextureManager::Inst()->LoadTexture("resources/terrain.jpg", 1)){
-		cout << "Image loaded!" << endl;
+	HeightMap* hmap = new HeightMap("resources/terrain.jpg");
+	if (!hmap){
+		exit(EXIT_FAILURE);
 	}
-	else{
-		cout << "Problem loading image!" << endl;
-	}
+	Mesh* mesh = hmap->getMesh();
+	vector<vec3>* vertices = mesh->vertices;
+	vector<vec3>* normals = mesh->normals;
+	vector<int>* index = mesh->index;
 
-	heightmap_t mesh = TextureManager::Inst()->genMesh();
-	vector<vec3> vertices = mesh.vertices;
-	vector<vec3> normals = mesh.normals;
+	/*for (int i = 0; i < 10; i++){
+		cout << endl;
+		cout << index->at(i) << endl;
+		cout << glm::to_string(vertices->at(i)) << endl;
+		cout << glm::to_string(normals->at(i)) << endl;
+	}*/
 
-	for (int i = 0; i < 20; i++){
-		cout << glm::to_string(vertices.at(i)) << endl;
-	}
-
+	cout << "triangles: " << index->size() / 3 << endl;
 	//Main Loop  
 	do
 	{
@@ -213,18 +215,25 @@ int main(void)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glPolygonMode(GL_FRONT, GL_FILL);
 
-		for (int i = 0; i < normals.size() - 1; i++){
-			//cout << "i=" << i * 3+2 << endl;
-			glBegin(GL_TRIANGLES);
-			glNormal3f(normals.at(i).x, normals.at(i).y, normals.at(i).z);
-			aux = vertices.at(i * 3);
-			glVertex3f(aux.x, aux.y, aux.z);
-			aux = vertices.at(i * 3 + 1);
-			glVertex3f(aux.x, aux.y, aux.z);
-			aux = vertices.at(i * 3 + 2);
-			glVertex3f(aux.x, aux.y, aux.z);
-			glEnd();
+		int n = 0;
+		glBegin(GL_POINTS);
+		for (int i = 0; i < vertices->size(); i++){
+			vec3 v = vertices->at(i);
+			glVertex3f(v.x, v.y, v.z);
 		}
+		glEnd();
+		//for (int i = 0; i < index->size(); i+=3){
+		//	//cout << "i=" << i * 3+2 << endl;
+		//	glBegin(GL_TRIANGLES);
+		//	glNormal3f(normals->at(n).x, normals->at(n).y, normals->at(n).z);
+		//	aux = vertices->at(index->at(i));
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(index->at(i+1));
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(index->at(i+2));
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	glEnd();
+		//}
 		//glBegin(GL_TRIANGLES);
 		//glNormal3f(0, 0, -1);
 		//glVertex3f(0.0f, 0.5f, 0.0f);
