@@ -22,11 +22,11 @@
     <Text Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\HeightMap.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="src\HeightMap.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{699DD95F-8953-4BED-8201-44A17BFAD972}</ProjectGuid>
