@@ -91,20 +91,31 @@ bool TextureManager::LoadTexture(const char* filename, const unsigned int texID,
 	//compute vertex and normals
 	vector<vec3> vertices;
 	vector<vec3> normals;
+	float scale = 0.05f;
 	for (int i = 0; i < width -1; i++){
 		for (int j = 0; j < height-1; j++){
 			// four corners' vertex
 			//t1
-			vec3 v00t1(i, bits[mat2vecIndex(i, j, width)] / 255.0f, j); // x, height, z
-			vec3 v10t1(i + 1, bits[mat2vecIndex(i + 1, j, width)] / 255.0f, j); // x, height, z
-			vec3 v11t1(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f, j + 1); // x, height, z
+			//vec3 v00t1(i, bits[mat2vecIndex(i, j, width)] / 255.0f * scale, j); // x, height, z
+			//vec3 v10t1(i + 1, bits[mat2vecIndex(i + 1, j, width)] / 255.0f* scale, j); // x, height, z
+			//vec3 v11t1(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f* scale, j + 1); // x, height, z
+			////t2
+			//vec3 v11t2(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f* scale, j + 1); // x, height, z
+			//vec3 v01t2(i, bits[mat2vecIndex(i, j + 1, width)] / 255.0f* scale, j + 1); // x, height, z
+			//vec3 v00t2(i, bits[mat2vecIndex(i, j, width)] / 255.0f* scale, j); // x, height, z
+			float fi = (float) i;
+			float fj = (float) j;
+			vec3 v00t1 = vec3(fi, 0, fj) * scale; // x, height, z
+			vec3 v10t1 = vec3(fi + 1, 0, fj) * scale; // x, height, z
+			vec3 v11t1 = vec3(fi + 1, 0, fj + 1) * scale; // x, height, z
 			//t2
-			vec3 v11t2(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f, j + 1); // x, height, z
-			vec3 v01t2(i, bits[mat2vecIndex(i, j + 1, width)] / 255.0f, j + 1); // x, height, z
-			vec3 v00t2(i, bits[mat2vecIndex(i, j, width)] / 255.0f, j); // x, height, z
+			vec3 v11t2 = vec3(fi, 0, fj + 1) * scale; // x, height, z
+			vec3 v01t2 = vec3(fi, 0, fj + 1) * scale; // x, height, z			
+			vec3 v00t2 = vec3(fi, 0, fj) * scale; // x, height, z			
+			
 
-			vec3 n1 = cross(v00t1 - v10t1, v00t1 - v11t1);
-			vec3 n2 = cross(v01t2 - v00t2, v01t2 - v11t2);
+			vec3 n1 = glm::normalize(cross(v00t1 - v10t1, v00t1 - v11t1));
+			vec3 n2 = glm::normalize(cross(v01t2 - v00t2, v01t2 - v11t2));
 			//t1
 			vertices.push_back(v00t1);
 			vertices.push_back(v10t1);
@@ -118,6 +129,7 @@ bool TextureManager::LoadTexture(const char* filename, const unsigned int texID,
 			normals.push_back(n2);
 		}
 	}
+
 	hmap.normals = normals;
 	hmap.vertices = vertices;
 	hmap.w = width;

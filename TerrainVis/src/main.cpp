@@ -1,7 +1,8 @@
 // template proect for opengl+glew+glfw
 // if it shows a green screen, then it works!
 // author: @tengel
-
+#define WIDTH 1000
+#define HEIGHT 1000
 
 //Include GLEW  
 #include "GL/glew.h"
@@ -11,6 +12,7 @@
 
 // GLM
 #include <glm\glm.hpp>
+#include "glm\gtx\string_cast.hpp"
 
 //Include the standard C++ headers  
 #include <iostream>
@@ -21,8 +23,10 @@
 using namespace std;
 
 mat4 g_Modelview = glm::mat4();
-vec4 g_Middle(-0.5f, -0.5f, -0.5f, 1.0f);
-vec3 g_Rotation(0, 0, 0);
+
+vec4 g_Center = vec4(0,10,0,1);
+vec4 g_Up = vec4(1,0,0,1); // y is up
+vec4 g_Eye = vec4(0, -1, 0, 1);
 
 //Define an error callback  
 void error_callback(int error, const char* description)
@@ -34,28 +38,42 @@ void error_callback(int error, const char* description)
 //Define the key input callback  
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	if (key == GLFW_KEY_W && action == GLFW_PRESS){
-		g_Middle += 0.1;
+	if (action == GLFW_PRESS || action == GLFW_REPEAT){
+		switch (key){
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, GL_TRUE);
+			break;
+		case GLFW_KEY_W:
+			g_Center.x += 0.5;
+			break;
+		case GLFW_KEY_S:
+			g_Center.x -= 0.5;
+			break;
+		case GLFW_KEY_A:
+			g_Center.z += 0.5;
+			break;
+		case GLFW_KEY_D:
+			g_Center.z -= 0.5;
+			break;
+		}
 	}
-	else if (key == GLFW_KEY_S && action == GLFW_PRESS){
-		g_Middle -= 0.1;
-	}
-	else if (key == GLFW_KEY_Z && action == GLFW_PRESS){
-		g_Rotation.z = 1.0f;
-	}
-	else if (key == GLFW_KEY_X && action == GLFW_PRESS){
-		g_Rotation.x = 1.0f;
-	}
-	else if (key == GLFW_KEY_C && action == GLFW_PRESS){
-		g_Rotation.y = 1.0f;
-	}
+}
+void cursorPosCB(GLFWwindow* window, double x, double y)
+{
+
 }
 
 void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
-	// TODO
-	cout << "btn " << action << endl;
+
+}
+
+void mouseScrollCB(GLFWwindow* window, double offx, double offy){
+	if (offy == 1){
+		g_Center.y *= 1.2;
+	}
+	else if (offy == -1){
+		g_Center.y *= 0.8;
+	}
 }
 
 void SetupLighting()
@@ -81,19 +99,16 @@ void SetupLighting()
 
 void SetupModelview()
 {
-	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glMultMatrixf(&g_Modelview[0][0]);
-	glTranslatef(g_Middle[0], g_Middle[1], g_Middle[2]);//Center the object!
-	glRotatef(10, g_Rotation.x, g_Rotation.y, g_Rotation.z);
 }
 
 void SetupProjection()
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0,1,0,1,0.1,100);
+	gluPerspective(60.0, 1, 0.01, 200);
+
 }
 
 int main(void)
@@ -111,7 +126,7 @@ int main(void)
 	GLFWwindow* window;
 
 	//Create a window and create its OpenGL context  
-	window = glfwCreateWindow(640, 480, "Test Window", NULL, NULL);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "TerrainVis", NULL, NULL);
 
 	//If the window couldn't be created  
 	if (!window)
@@ -127,7 +142,8 @@ int main(void)
 	//Sets the key callback  
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouseButtonCB);
-
+	glfwSetCursorPosCallback(window, GLFWcursorposfun(cursorPosCB));
+	glfwSetScrollCallback(window, GLFWscrollfun(mouseScrollCB));
 	//Initialize GLEW  
 	GLenum err = glewInit();
 
@@ -157,6 +173,10 @@ int main(void)
 	vector<vec3> vertices = mesh.vertices;
 	vector<vec3> normals = mesh.normals;
 
+	for (int i = 0; i < 20; i++){
+		cout << glm::to_string(vertices.at(i)) << endl;
+	}
+
 	//Main Loop  
 	do
 	{
@@ -184,7 +204,15 @@ int main(void)
 		//glDisable(GL_TEXTURE_2D);
 		SetupModelview();
 		SetupProjection();
+
+		gluLookAt(g_Eye.x, g_Eye.y, g_Eye.z,
+			g_Center.x, g_Center.y, g_Center.z,
+			g_Up.x, g_Up.y, g_Up.z);
+
 		vec3 aux;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT, GL_FILL);
+
 		for (int i = 0; i < normals.size() - 1; i++){
 			//cout << "i=" << i * 3+2 << endl;
 			glBegin(GL_TRIANGLES);
@@ -196,18 +224,13 @@ int main(void)
 			aux = vertices.at(i * 3 + 2);
 			glVertex3f(aux.x, aux.y, aux.z);
 			glEnd();
-
-			//glBegin(GL_TRIANGLES);
-			//glNormal3f(normals.at(i + 1).x, normals.at(i + 1).y, normals.at(i + 1).z);
-			//aux = vertices.at(i * 3 + 3);
-			//glVertex3f(aux.x, aux.y, aux.z);
-			//aux = vertices.at(i * 3 + 4);
-			//glVertex3f(aux.x, aux.y, aux.z);
-			//aux = vertices.at(i * 3 + 5);
-			//glVertex3f(aux.x, aux.y, aux.z);
-			//glEnd();
 		}
-
+		//glBegin(GL_TRIANGLES);
+		//glNormal3f(0, 0, -1);
+		//glVertex3f(0.0f, 0.5f, 0.0f);
+		//glVertex3f(0.0f, 0.0f, 0.5f);
+		//glVertex3f(0.5f, 0.0f, 0.0f);
+		//glEnd();
 
 
 		//Swap buffers  
