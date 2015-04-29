@@ -13,6 +13,7 @@
 // GLM
 #include <glm\glm.hpp>
 #include "glm\gtx\string_cast.hpp"
+#include "glm\matrix.hpp"
 
 //Include the standard C++ headers  
 #include <iostream>
@@ -25,9 +26,9 @@ using namespace std;
 mat4 g_Modelview = glm::mat4();
 mat4 g_CameraMatrix = mat4();
 
-vec4 g_Center = vec4(0.0f,20.0f,0.0f,1.0f);
-vec4 g_Up = vec4(0.0f, 1.0f, 1.0f, 1.0f); // y is up
-vec4 g_Eye = vec4(0.0f, -1.0f, 0.0f, 1.0f);
+vec4 g_Center = vec4(0.0f,0.0f,0.0f,1.0f);
+vec4 g_Up	  = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+vec4 g_Eye    = vec4(0.0f, -1.0f, 0.0f, 1.0f);
 bool mousePressed = false;
 vec2 mousePos = vec2();
 
@@ -64,7 +65,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void cursorPosCB(GLFWwindow* window, double x, double y)
 {
 	vec3 axis(sqrt((float)((x - mousePos.x)*(x - mousePos.x) + (y - mousePos.y)*(y - mousePos.y))), (float)(y - mousePos.y), (float)(x - mousePos.x));
-	//glm::rotate(g_CameraMatrix, 10);
+	//g_CameraMatrix = glm::rotate(mat4(), 10.0f, axis);
 }
 
 void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
@@ -72,21 +73,22 @@ void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
 }
 
 void mouseScrollCB(GLFWwindow* window, double offx, double offy){
+	
 	if (offy == 1){
-		g_Center.y + 0.5;
-	}
-	else if (offy == -1){
 		g_Center.y -= 0.5;
+	}
+	if (offy == -1){
+		g_Center.y += 0.5;
 	}
 }
 
 void SetupLighting()
 {
-	float ambiant[4] = { 0.2, 0.2, 0.2, 1. };
-	float diffuse[4] = { 0.7, 0.7, 0.7, 1. };
-	float specular[4] = { 1, 1, 1, 1. };
+	float ambiant[4] = { 0.2, 0.2, 0.2, 1 };
+	float diffuse[4] = { 0.7, 0.7, 0.7, 1 };
+	float specular[4] = { 1, 1, 1, 1 };
 	float exponent = 4;
-	float lightDir[4] = { 0, 0, 0, 0 };
+	float lightDir[4] = { g_Eye.x, g_Eye.y, g_Eye.z };
 
 	glEnable(GL_COLOR);
 	glEnable(GL_COLOR_MATERIAL);
@@ -167,7 +169,7 @@ int main(void)
 	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 	SetupLighting();
 
-	HeightMap* hmap = new HeightMap("resources/terrain2.jpg");
+	HeightMap* hmap = new HeightMap("resources/terrain.jpg");
 	if (!hmap){
 		exit(EXIT_FAILURE);
 	}
@@ -187,30 +189,11 @@ int main(void)
 	//Main Loop  
 	do
 	{
-		float side = 1.0f;
-		//Clear color buffer  
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		//glEnable(GL_TEXTURE_2D);
-		//
-		//if (!TextureManager::Inst()->BindTexture(1)){
-		//	cout << "Error binding!" << endl;
-		//}
-
-		//glBegin(GL_QUADS);
-		//glTexCoord2f(0.0f, 0.0f);
-		//glVertex2f(-side , -side);
-		//glTexCoord2f(1.0f, 0.0f);
-		//glVertex2f(side, -side);
-		//glTexCoord2f(1.0f, 1.0f);
-		//glVertex2f(side, side);
-		//glTexCoord2f(0.0f, 1.0f);
-		//glVertex2f(-side, side); 
-		//glEnd();
-
-		//glDisable(GL_TEXTURE_2D);
+		SetupLighting();
 		SetupModelview();
 		SetupProjection();
+		glViewport(0, 0, WIDTH, HEIGHT);
 
 		gluLookAt(g_Eye.x, g_Eye.y, g_Eye.z,
 			g_Center.x, g_Center.y, g_Center.z,
@@ -230,7 +213,7 @@ int main(void)
 		for (int i = 0; i < index->size(); i+=3){
 			//cout << "i=" << i * 3+2 << endl;
 			glBegin(GL_TRIANGLES);
-			glNormal3f(normals->at(n).x, normals->at(n).y, normals->at(n).z);
+			glNormal3f(normals->at(n).x, normals->at(n).y, normals->at(n).z);			
 			aux = vertices->at(index->at(i));
 			glVertex3f(aux.x, aux.y, aux.z);
 			aux = vertices->at(index->at(i+1));
@@ -239,13 +222,6 @@ int main(void)
 			glVertex3f(aux.x, aux.y, aux.z);
 			glEnd();
 		}
-		//glBegin(GL_TRIANGLES);
-		//glNormal3f(0, 0, -1);
-		//glVertex3f(0.0f, 0.5f, 0.0f);
-		//glVertex3f(0.0f, 0.0f, 0.5f);
-		//glVertex3f(0.5f, 0.0f, 0.0f);
-		//glEnd();
-
 
 		//Swap buffers  
 		glfwSwapBuffers(window);

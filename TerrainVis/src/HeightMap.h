@@ -44,6 +44,7 @@ private:
 	Mesh* mesh = NULL;
 	unsigned int height, width;
 	GLuint vboID, vaoID;
+	unsigned int ptr_inc;
 };
 
 #endif

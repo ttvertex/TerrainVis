@@ -36,6 +36,8 @@ HeightMap::HeightMap(const char* filename){
 	//if this somehow one of these failed (they shouldn't), return failure
 	if ((bits == 0) || (this->width == 0) || (this->height == 0))
 		exit(EXIT_FAILURE);
+	// How much to increase data pointer to get to next pixel data
+	ptr_inc = FreeImage_GetBPP(dib) == 24 ? 3 : 1;
 
 	mesh = new Mesh();
 	mesh->vertices = new vector<vec3>();
@@ -59,15 +61,23 @@ void HeightMap::genMesh(BYTE* bits){
 	float scaleFactorY =  1.0f / 255.0f;
 	float scaleFactorZ = 1.0f / width;
 	
+	// Length of one row in data
+	unsigned int row_step = ptr_inc * width;
+
 	// vertices
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
 			//vec3 v = (vec3(-0.5f, 0.0f, -0.5f) + vec3(i * scaleFactorX, bits[mat2vecIndex((int)i, (int)j, width)] * scaleFactorY, j * scaleFactorZ));
-			vec3 v = (vec3(-0.5f,0.0f,-0.5f) + vec3(i*scaleFactorX, 0.0f, j* scaleFactorZ));
-			mesh->vertices->push_back(v);
+			//vec3 v = (vec3(-0.5f,0.0f,-0.5f) + vec3(i*scaleFactorX, 0.0f, j* scaleFactorZ));
+			//mesh->vertices->push_back(v);
+			float fScaleC = float(j) / float(width - 1);
+			float fScaleR = float(i) / float(height - 1);
+			float fVertexHeight = float(*(bits + row_step * i + j * ptr_inc)) / 255.0f;
+			mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR));
 		}
 	}
-
+	// load vertices from heights data
+	
 	// gen index - seems to be working
 	for (int i = 0; i < height-1; i++){
 		for (int j = 0; j < width-1; j++){
@@ -86,13 +96,29 @@ void HeightMap::genMesh(BYTE* bits){
 	//normals
 	cout << "indexsize" << mesh->index->size() << endl;
 	cout << "vsize" << mesh->vertices->size() << endl;
-	for (int i = 0; i < mesh->index->size(); i+=3){
-		vec3 v1 = mesh->vertices->at(mesh->index->at(i));
-		vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
-		vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
-		
-		vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
-		mesh->normals->push_back(n1);
+	//for (int i = 0; i < mesh->index->size(); i+=3){
+	//	vec3 v1 = mesh->vertices->at(mesh->index->at(i));
+	//	vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
+	//	vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
+	//	
+	//	vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
+	//	mesh->normals->push_back(n1);
+	//}
+	
+	for (int i = 0; i < height - 1; i++){
+		for (int j = 0; j < width - 1; j++){
+
+			vec3 v1 = mesh->vertices->at(mat2vecIndex(i, j, width));
+			vec3 v2 = mesh->vertices->at(mat2vecIndex(i + 1, j, width));
+			vec3 v3 = mesh->vertices->at(mat2vecIndex(i + 1, j + 1, width));
+			vec3 v4 = mesh->vertices->at(mat2vecIndex(i, j + 1, width));
+
+			vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
+			vec3 n2 = glm::normalize(cross(v4 - v1, v4 - v3));
+
+			mesh->normals->push_back(n1);
+			mesh->normals->push_back(n2);
+		}
 	}
 }
 
