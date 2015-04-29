@@ -9,16 +9,39 @@
 #include <string>
 #include "glutils.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+
+#define _DEBUG
+
+using namespace std;
 using std::ifstream;
 using std::string;
-using namespace std;
+using glm::mat4;
 
-SceneBasic::SceneBasic() {
+SceneBasic::SceneBasic(GLFWwindow* window) {
+	this->window = window;
 
+	// init matrices
+	model = glm::mat4(1.0f);
+	view = glm::lookAt(
+		vec3(0.0f, 0.0f, -1.0f), //eye
+		vec3(0.0f, 0.0f, 0.0f), //center
+		vec3(0.0f, 1.0f, 0.0f)); //up
+	projection = glm::perspective(glm::radians(60.0f), 1.0f, 0.1f, 100.0f);
+	mvpMat = glm::mat4(1.0f);
 }
 
 void SceneBasic::initScene()
 {
+#ifdef _DEBUG
+	glDebugMessageCallback(GLUtils::debugCallback, NULL);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+		GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
+#endif
+
 	// load shaders
 	try {
 		prog.compileShader("shader/basic.vert");
@@ -30,7 +53,9 @@ void SceneBasic::initScene()
 		cerr << e.what() << endl;
 		exit(EXIT_FAILURE);
 	}
+
 	prog.printActiveAttribs();
+	//prog.setUniform("MVP", &mvpMat[0][0]);
 
 	/////////////////// Create the VBO ////////////////////
 	float positionData[] = {
@@ -69,9 +94,18 @@ void SceneBasic::initScene()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
 }
 
+void SceneBasic::setUpMatrices(){
+	//model *= glm::translate(vec3(0.0f, 0.001f, 0.0f)); //push up
+	//model *= glm::rotate(0.01f,vec3(1.0f, 1.0f, 0.0f)); //rotate xz
+	model = glm::translate(vec3(0.0f, 0.0f, 1.0f)); // push back
+	mvpMat = projection * view * model;
+	prog.setUniform("ModelViewMatrix", mvpMat);
+}
+
 void SceneBasic::update(float t)
 {
-
+	setUpMatrices();
+	//...
 }
 
 void SceneBasic::render()
@@ -85,4 +119,7 @@ void SceneBasic::render()
 void SceneBasic::resize(int w, int h)
 {
 	glViewport(0, 0, w, h);
+	width = w;
+	height = h;
+	projection = glm::perspective(glm::radians(60.0f), (float)w / h, 0.3f, 100.0f);
 }

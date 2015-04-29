@@ -5,9 +5,11 @@ layout (location=1) in vec3 VertexColor;
 
 out vec3 Color;
 
+uniform mat4 ModelViewMatrix;
+
 void main()
 {
     Color = VertexColor;
-
-    gl_Position = vec4(VertexPosition,1.0);
+	
+	gl_Position = ModelViewMatrix * vec4(VertexPosition,1.0);
 }

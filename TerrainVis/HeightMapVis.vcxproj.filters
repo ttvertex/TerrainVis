@@ -24,4 +24,8 @@
     <ClInclude Include="src\SceneBasic.h" />
     <ClInclude Include="src\glslprogram.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\basic.frag" />
+    <None Include="shader\basic.vert" />
+  </ItemGroup>
 </Project>

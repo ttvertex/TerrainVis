@@ -5,6 +5,7 @@
 
 #include "gl_core_4_4.h"
 #include "glslprogram.h"
+#include "GLFW\glfw3.h"
 
 class SceneBasic : public Scene
 {
@@ -14,8 +15,15 @@ private:
 	GLuint vaoHandle;
 	GLSLProgram prog;
 
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
+	glm::mat4 mvpMat;
+
+	void setUpMatrices();
+	GLFWwindow* window;
 public:
-	SceneBasic();
+	SceneBasic(GLFWwindow* window);
 
 	void initScene();
 	void update(float t);

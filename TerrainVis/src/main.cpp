@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 using std::string;
 
 Scene *scene;
@@ -13,7 +15,9 @@ GLFWwindow *window;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	
+	if (key == GLFW_KEY_W && action == GLFW_REPEAT){
+		
+	}
 }
 
 void initializeGL() {
@@ -49,14 +53,14 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	// Open the window
-	string title = "TerrainVis (C) tengel";
+	string title = "TerrainVis by tengel";
 	window = glfwCreateWindow(500, 500, title.c_str(), NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, key_callback);
+	//glfwSetKeyCallback(window, key_callback);
 
 	// Load the OpenGL functions.
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED) {
@@ -66,7 +70,7 @@ int main(int argc, char *argv[])
 
 	GLUtils::dumpGLInfo();
 
-	scene = new SceneBasic();
+	scene = new SceneBasic(window);
 
 	// Initialization
 	initializeGL();

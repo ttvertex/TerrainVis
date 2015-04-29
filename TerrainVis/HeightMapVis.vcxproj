@@ -37,6 +37,10 @@
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneBasic.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\basic.frag" />
+    <None Include="shader\basic.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{699DD95F-8953-4BED-8201-44A17BFAD972}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
