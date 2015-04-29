@@ -24,7 +24,7 @@ using namespace glm;
 typedef struct{
 	vector<vec3>* vertices;
 	vector<vec3>* normals;
-	vector<int>* index;
+	vector<unsigned int>* index;
 }Mesh;
 
 typedef struct{
@@ -45,7 +45,7 @@ public:
 
 	Mesh* getMesh();
 	vector<vertex_t>* getVertices();
-
+	void render();
 private:
 	vector<vertex_t>* vert_t;
 	void genMesh(BYTE* imgData);
@@ -53,7 +53,7 @@ private:
 
 	Mesh* mesh = NULL;
 	unsigned int height, width;
-	GLuint vboID, vaoID;
+	GLuint vboID, vaoID, iboID;
 	unsigned int ptr_inc;
 };
 

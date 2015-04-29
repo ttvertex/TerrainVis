@@ -42,9 +42,10 @@ HeightMap::HeightMap(const char* filename){
 	mesh = new Mesh();
 	mesh->vertices = new vector<vec3>();
 	mesh->normals = new vector<vec3>();
-	mesh->index = new vector<int>();
+	mesh->index = new vector<unsigned int>();
 
 	genMesh(bits);
+	genBuffers();
 
 	//Free FreeImage's copy of the data
 	FreeImage_Unload(dib);	
@@ -140,28 +141,25 @@ void HeightMap::genMesh(BYTE* bits){
 vector<vertex_t>* HeightMap::getVertices(){
 	return this->vert_t;
 }
-
 void HeightMap::genBuffers(){
-	//GLuint vboID;
-	//glGenBuffers(1, &vboID); // Create the buffer ID, this is basically the same as generating texture ID's
-	//glBindBuffer(GL_ARRAY_BUFFER, vboID); // Bind the buffer (vertex array data)
+}
 
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * mesh->vertices->size(), NULL, GL_STATIC_DRAW);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec3) * mesh->vertices->size(), mesh->vertices); // Actually upload the data
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec3) * mesh->vertices->size(), mesh->vertices); // Actually upload the data
-
-	//glNormalPointer(GL_FLOAT, sizeof(vec3), NULL);
-	//glVertexPointer(3, GL_FLOAT, sizeof(vec3), BUFFEROFFSET(0));
-
-	//GLuint indexVBOID;
-	//glGenBuffers(1, &indexVBOID); // Generate buffer
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBOID); // Bind the element array buffer
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * vertCount, indices, GL_STATIC_DRAW);
-
-
-	//vVboIDs = vboID;
-	//iVboIDs = indexVBOID;
-	//vboSize = vertCount;
+void HeightMap::render(){
+	//triangle_t
+	for (int i = 0; i < mesh->index->size(); i+=3){
+		glBegin(GL_TRIANGLES);
+		int ind[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2) };
+		vertex_t v = vert_t->at(ind[0]);
+		glNormal3f(v.n.x, v.n.y, v.n.z);
+		glVertex3f(v.v.x, v.v.y, v.v.z);
+		v = vert_t->at(ind[1]);
+		glNormal3f(v.n.x, v.n.y, v.n.z);
+		glVertex3f(v.v.x, v.v.y, v.v.z);
+		v = vert_t->at(ind[2]);
+		glNormal3f(v.n.x, v.n.y, v.n.z);
+		glVertex3f(v.v.x, v.v.y, v.v.z);
+		glEnd();
+	}
 }
 
 Mesh* HeightMap::getMesh(){
