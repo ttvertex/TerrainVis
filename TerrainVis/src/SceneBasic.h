@@ -4,6 +4,7 @@
 #include "scene.h"
 
 #include "gl_core_4_4.h"
+#include "glslprogram.h"
 
 class SceneBasic : public Scene
 {
@@ -11,8 +12,7 @@ private:
 	int width, height;
 	GLuint vboHandles[2];
 	GLuint vaoHandle;
-
-	void linkMe(GLint vertShader, GLint fragShader);
+	GLSLProgram prog;
 
 public:
 	SceneBasic();
@@ -21,6 +21,7 @@ public:
 	void update(float t);
 	void render();
 	void resize(int, int);
+	
 };
 
 #endif // SCENEBASIC_H

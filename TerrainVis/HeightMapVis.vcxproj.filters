@@ -6,6 +6,7 @@
     <ClCompile Include="src\gl_core_4_4.c" />
     <ClCompile Include="src\glutils.cpp" />
     <ClCompile Include="src\SceneBasic.cpp" />
+    <ClCompile Include="src\glslprogram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="README.txt" />
@@ -21,5 +22,6 @@
     <ClInclude Include="src\gl_core_4_4.h" />
     <ClInclude Include="src\glutils.h" />
     <ClInclude Include="src\SceneBasic.h" />
+    <ClInclude Include="src\glslprogram.h" />
   </ItemGroup>
 </Project>
