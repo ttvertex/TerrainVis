@@ -3,6 +3,9 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\HeightMap.cpp" />
+    <ClCompile Include="src\gl_core_4_4.c" />
+    <ClCompile Include="src\glutils.cpp" />
+    <ClCompile Include="src\SceneBasic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="README.txt" />
@@ -14,5 +17,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HeightMap.h" />
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\gl_core_4_4.h" />
+    <ClInclude Include="src\glutils.h" />
+    <ClInclude Include="src\SceneBasic.h" />
   </ItemGroup>
 </Project>

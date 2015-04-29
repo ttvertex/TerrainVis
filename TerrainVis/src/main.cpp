@@ -1,211 +1,81 @@
-// template proect for opengl+glew+glfw
-// if it shows a green screen, then it works!
-// author: @tengel
-#define WIDTH 1000
-#define HEIGHT 1000
+#include "gl_core_4_4.h"
+#include <GLFW/glfw3.h>
+#include "glutils.h"
+#include "Scene.h"
+#include "SceneBasic.h"
+#include <cstdlib>
+#include <cstdio>
+#include <string>
+using std::string;
 
-//Include GLEW  
-#include "GL/glew.h"
+Scene *scene;
+GLFWwindow *window;
 
-//Include GLFW  
-#include <GLFW/glfw3.h>  
-
-// GLM
-#include <glm\glm.hpp>
-#include "glm\gtx\string_cast.hpp"
-#include "glm\matrix.hpp"
-
-//Include the standard C++ headers  
-#include <iostream>
-#include <cassert>
-
-#include "HeightMap.h"
-
-using namespace std;
-
-mat4 g_Modelview = glm::mat4();
-mat4 g_CameraMatrix = mat4();
-
-vec4 g_Center = vec4(0.0f,0.0f,0.0f,1.0f);
-vec4 g_Up	  = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-vec4 g_Eye    = vec4(0.0f, -1.0f, 0.0f, 1.0f);
-bool mousePressed = false;
-vec2 mousePos = vec2();
-
-//Define an error callback  
-void error_callback(int error, const char* description)
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	fputs(description, stderr);
-	_fgetchar();
-}
 	
-//Define the key input callback  
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (action == GLFW_PRESS || action == GLFW_REPEAT){
-		switch (key){
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, GL_TRUE);
-			break;
-		case GLFW_KEY_W:
-			g_Center.x += 0.5;
-			break;
-		case GLFW_KEY_S:
-			g_Center.x -= 0.5;
-			break;
-		case GLFW_KEY_A:
-			g_Center.z += 0.5;
-			break;
-		case GLFW_KEY_D:
-			g_Center.z -= 0.5;
-			break;
-		}
-	}
-}
-void cursorPosCB(GLFWwindow* window, double x, double y)
-{
-	vec3 axis(sqrt((float)((x - mousePos.x)*(x - mousePos.x) + (y - mousePos.y)*(y - mousePos.y))), (float)(y - mousePos.y), (float)(x - mousePos.x));
-	//g_CameraMatrix = glm::rotate(mat4(), 10.0f, axis);
 }
 
-void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
-
+void initializeGL() {
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	scene->initScene();
 }
 
-void mouseScrollCB(GLFWwindow* window, double offx, double offy){
-	
-	if (offy == 1){
-		g_Center.y -= 0.5;
-	}
-	if (offy == -1){
-		g_Center.y += 0.5;
+void mainLoop() {
+	while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+		scene->update(float(glfwGetTime()));
+		scene->render();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 }
 
-void SetupLighting()
-{
-	float ambiant[4] = { 0.2, 0.2, 0.2, 1 };
-	float diffuse[4] = { 0.7, 0.7, 0.7, 1 };
-	float specular[4] = { 1, 1, 1, 1 };
-	float exponent = 4;
-	float lightDir[4] = { -0.5f, 0.0f, -0.5f, 0 }; //{ g_Eye.x, g_Eye.y, g_Eye.z };
-
-	glEnable(GL_COLOR);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_FRONT_AND_BACK);
-
-	glEnable(GL_LIGHTING);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambiant);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, exponent);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, lightDir);
-	glEnable(GL_LIGHT0);
+void resizeGL(int w, int h) {
+	scene->resize(w, h);
 }
 
-void SetupModelview()
+int main(int argc, char *argv[])
 {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(g_Center.x, g_Center.y, g_Center.z);
-}
 
-void SetupProjection()
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(60.0, 1, 0.01, 500);
+	// Initialize GLFW
+	if (!glfwInit()) exit(EXIT_FAILURE);
 
-}
+	// Select OpenGL 4.3 with a forward compatible core profile.
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-int main(void)
-{
-	//Set the error callback  
-	glfwSetErrorCallback(error_callback);
-
-	//Initialize GLFW  
-	if (!glfwInit())
-	{
+	// Open the window
+	string title = "TerrainVis -- ";
+	window = glfwCreateWindow(500, 500, title.c_str(), NULL, NULL);
+	if (!window) {
+		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
+	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, key_callback);
 
-	//Declare a window object  
-	GLFWwindow* window;
-
-	//Create a window and create its OpenGL context  
-	window = glfwCreateWindow(WIDTH, HEIGHT, "TerrainVis", NULL, NULL);
-
-	//If the window couldn't be created  
-	if (!window)
-	{
-		fprintf(stderr, "Failed to open GLFW window.\n");
+	// Load the OpenGL functions.
+	if (ogl_LoadFunctions() == ogl_LOAD_FAILED) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	//This function makes the context of the specified window current on the calling thread.   
-	glfwMakeContextCurrent(window);
+	GLUtils::dumpGLInfo();
 
-	//Sets the key callback  
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetMouseButtonCallback(window, mouseButtonCB);
-	glfwSetCursorPosCallback(window, GLFWcursorposfun(cursorPosCB));
-	glfwSetScrollCallback(window, GLFWscrollfun(mouseScrollCB));
-	//Initialize GLEW  
-	GLenum err = glewInit();
+	scene = new SceneBasic();
 
-	//If GLEW hasn't initialized  
-	if (err != GLEW_OK)
-	{
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-		return -1;
-	}
+	// Initialization
+	initializeGL();
 
-	printf("%s\n", glGetString(GL_RENDERER));
-	printf("GL %s\n", glGetString(GL_VERSION));
-	printf("GLSL %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	// Enter the main loop
+	mainLoop();
 
-	//Set a background color  
-	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
-	SetupLighting();
-
-	HeightMap* hmap = new HeightMap("resources/terrain.jpg");
-	if (!hmap){
-		exit(EXIT_FAILURE);
-	}
-
-	//Main Loop  
-	do
-	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		SetupModelview();
-		SetupProjection();
-
-		gluLookAt(g_Eye.x, g_Eye.y, g_Eye.z,
-			g_Center.x, g_Center.y, g_Center.z,
-			g_Up.x, g_Up.y, g_Up.z);
-
-		vec3 aux;
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-		hmap->render();
-
-		
-		//Swap buffers  
-		glfwSwapBuffers(window);
-		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
-		glfwPollEvents();
-
-	} //Check if the ESC key had been pressed or if the window had been closed  
-	while (!glfwWindowShouldClose(window));
-
-	//Close OpenGL window and terminate GLFW  
-	glfwDestroyWindow(window);
-	//Finalize and clean up GLFW  
+	// Close window and terminate GLFW
 	glfwTerminate();
-
-	system("pause");
+	// Exit program
 	exit(EXIT_SUCCESS);
 }
