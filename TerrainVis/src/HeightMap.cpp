@@ -36,6 +36,8 @@ HeightMap::HeightMap(const char* filename){
 	//if this somehow one of these failed (they shouldn't), return failure
 	if ((bits == 0) || (this->width == 0) || (this->height == 0))
 		exit(EXIT_FAILURE);
+	// How much to increase data pointer to get to next pixel data
+	ptr_inc = FreeImage_GetBPP(dib) == 24 ? 3 : 1;
 
 	mesh = new Mesh();
 	mesh->vertices = new vector<vec3>();
@@ -53,21 +55,36 @@ int mat2vecIndex(int r, int c, int nc){
 }
 
 void HeightMap::genMesh(BYTE* bits){
-	cout << "(" << width << "," << height << ")" << endl;
-	float scaleFactor = 1.0f;
+	float scaleFactorX = 1.0f / height;
+	float scaleFactorY =  1.0f / 255.0f;
+	float scaleFactorZ = 1.0f / width;
 	
+	// Length of one row in data
+	unsigned int row_step = ptr_inc * width;
+	/* --ptr_inc -  by how much we need to increase data pointer to move by one height value in data - 
+		point is, that when we have for example 24 - bit image, for now we would only care for R value 
+		as the value with intensity, and we need to move 3 bytes from current pointer position to point
+		at next value, but if we have 8 -  it image(our case), we need to move by 1 byte only
+	  --row_step - the width of one row in memory, it's just number of columns multiplied by ptr_inc */
+
 	// vertices
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
-			vec3 v = vec3(i, bits[mat2vecIndex((int)i, (int)j, width)], j) * scaleFactor;
-			mesh->vertices->push_back(v);
+			//vec3 v = (vec3(-0.5f, 0.0f, -0.5f) + vec3(i * scaleFactorX, bits[mat2vecIndex((int)i, (int)j, width)] * scaleFactorY, j * scaleFactorZ));
+			//vec3 v = (vec3(-0.5f,0.0f,-0.5f) + vec3(i*scaleFactorX, 0.0f, j* scaleFactorZ));
+			//mesh->vertices->push_back(v);
+			float fScaleC = float(j) / float(width - 1);
+			float fScaleR = float(i) / float(height - 1);
+			float fVertexHeight = float(*(bits + row_step * i + j * ptr_inc)) / 255.0f;
+			mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR));
 		}
 	}
-
-	// gen index
+	
+	// gen index - seems to be working
 	for (int i = 0; i < height-1; i++){
 		for (int j = 0; j < width-1; j++){
-			//t1
+			int start = i * width + j;
+			////t1
 			mesh->index->push_back(mat2vecIndex(i, j, width));
 			mesh->index->push_back(mat2vecIndex(i+1, j, width));
 			mesh->index->push_back(mat2vecIndex(i+1, j+1, width));
@@ -79,8 +96,6 @@ void HeightMap::genMesh(BYTE* bits){
 	}
 
 	//normals
-	cout << "indexsize" << mesh->index->size() << endl;
-	cout << "vsize" << mesh->vertices->size() << endl;
 	for (int i = 0; i < mesh->index->size(); i+=3){
 		vec3 v1 = mesh->vertices->at(mesh->index->at(i));
 		vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
@@ -89,61 +104,6 @@ void HeightMap::genMesh(BYTE* bits){
 		vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
 		mesh->normals->push_back(n1);
 	}
-	//for (int i = 0; i < height; i++){
-	//	for (int j = 0; j < width; j++){
-	//		// square
-	//		vec3 v00(0, bits[mat2vecIndex(i, j, width)], 0); // x, height, z
-	//		vec3 v10(0, bits[mat2vecIndex(i + 1, j, width)], 0); // x, height, z
-	//		vec3 v11(0, bits[mat2vecIndex(i + 1, j + 1, width)], 0); // x, height, z
-	//		vec3 v01(0, bits[mat2vecIndex(i, j + 1, width)], 0); // x, height, z
-	//		
-	//		// normal per triangle face
-	//		vec3 n1 = glm::normalize(cross(v00 - v10, v00 - v11));
-	//		vec3 n2 = glm::normalize(cross(v01 - v00, v01 - v11));
-
-	//		mesh->normals->push_back(n1);
-	//		mesh->normals->push_back(n2);
-	//	}
-	//}
-
-	//for (int i = 0; i < width - 1; i++){
-	//	for (int j = 0; j < height - 1; j++){
-	//		// four corners' vertex
-	//		//t1
-	//		//vec3 v00t1(i, bits[mat2vecIndex(i, j, width)] / 255.0f * scale, j); // x, height, z
-	//		//vec3 v10t1(i + 1, bits[mat2vecIndex(i + 1, j, width)] / 255.0f* scale, j); // x, height, z
-	//		//vec3 v11t1(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f* scale, j + 1); // x, height, z
-	//		////t2
-	//		//vec3 v11t2(i + 1, bits[mat2vecIndex(i + 1, j + 1, width)] / 255.0f* scale, j + 1); // x, height, z
-	//		//vec3 v01t2(i, bits[mat2vecIndex(i, j + 1, width)] / 255.0f* scale, j + 1); // x, height, z
-	//		//vec3 v00t2(i, bits[mat2vecIndex(i, j, width)] / 255.0f* scale, j); // x, height, z
-	//		float fi = (float)i;
-	//		float fj = (float)j;
-	//		//t1
-	//		vec3 v00t1 = vec3(fi, 0, fj) * scale; // x, height, z
-	//		vec3 v10t1 = vec3(fi + 1, 0, fj) * scale; // x, height, z
-	//		vec3 v11t1 = vec3(fi + 1, 0, fj + 1) * scale; // x, height, z
-	//		//t2
-	//		vec3 v11t2 = vec3(fi, 0, fj + 1) * scale; // x, height, z
-	//		vec3 v01t2 = vec3(fi, 0, fj + 1) * scale; // x, height, z
-	//		vec3 v00t2 = vec3(fi, 0, fj) * scale; // x, height, z
-
-
-	//		vec3 n1 = glm::normalize(cross(v00t1 - v10t1, v00t1 - v11t1));
-	//		vec3 n2 = glm::normalize(cross(v01t2 - v00t2, v01t2 - v11t2));
-	//		//t1
-	//		mesh->vertices->push_back(v00t1);
-	//		mesh->vertices->push_back(v10t1);
-	//		mesh->vertices->push_back(v11t1);
-	//		//t2
-	//		mesh->vertices->push_back(v11t2);
-	//		mesh->vertices->push_back(v01t2);
-	//		mesh->vertices->push_back(v00t2);
-
-	//		mesh->normals->push_back(n1);
-	//		mesh->normals->push_back(n2);
-	//	}
-	//}
 }
 
 Mesh* HeightMap::getMesh(){

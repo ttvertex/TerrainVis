@@ -15,6 +15,7 @@
 #include "FreeImage.h"
 #include <map>
 #include "glm\glm.hpp"
+#include "glm\gtx\string_cast.hpp"
 
 using namespace std;
 using namespace glm;
@@ -44,6 +45,7 @@ private:
 	Mesh* mesh = NULL;
 	unsigned int height, width;
 	GLuint vboID, vaoID;
+	unsigned int ptr_inc;
 };
 
 #endif
