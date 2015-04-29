@@ -11,9 +11,10 @@
 #include <vector>
 #include <iostream>
 #include <windows.h>
+#include <GL/glew.h>
 #include <gl/gl.h>
-#include "FreeImage.h"
 #include <map>
+#include "FreeImage.h"
 #include "glm\glm.hpp"
 #include "glm\gtx\string_cast.hpp"
 
@@ -25,6 +26,11 @@ typedef struct{
 	vector<vec3>* normals;
 	vector<int>* index;
 }Mesh;
+
+typedef struct{
+	glm::vec3 v;
+	glm::vec3 n;
+}vertex_t;
 
 class HeightMap
 {
@@ -38,9 +44,12 @@ public:
 	bool renderMesh(const unsigned int texID);
 
 	Mesh* getMesh();
-	
+	vector<vertex_t>* getVertices();
+
 private:
+	vector<vertex_t>* vert_t;
 	void genMesh(BYTE* imgData);
+	void genBuffers();
 
 	Mesh* mesh = NULL;
 	unsigned int height, width;

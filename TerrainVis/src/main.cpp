@@ -88,7 +88,7 @@ void SetupLighting()
 	float diffuse[4] = { 0.7, 0.7, 0.7, 1 };
 	float specular[4] = { 1, 1, 1, 1 };
 	float exponent = 4;
-	float lightDir[4] = { g_Eye.x, g_Eye.y, g_Eye.z };
+	float lightDir[4] = { -0.5f, 0.0f, -0.5f, 0 }; //{ g_Eye.x, g_Eye.y, g_Eye.z };
 
 	glEnable(GL_COLOR);
 	glEnable(GL_COLOR_MATERIAL);
@@ -177,52 +177,83 @@ int main(void)
 	vector<vec3>* vertices = mesh->vertices;
 	vector<vec3>* normals = mesh->normals;
 	vector<int>* index = mesh->index;
+	
+	vector<vertex_t>* verts = hmap->getVertices();
 
-	//for (int i = 0; i < 10; i++){
-	//	cout << endl;
-	//	cout << index->at(i) << endl;
-	//	cout << glm::to_string(vertices->at(i)) << endl;
-	//	cout << glm::to_string(normals->at(i)) << endl;
-	//}
+	for (int i = 0; i < 10; i++){
+		cout << endl;
+		cout << index->at(i) << endl;
+		cout << glm::to_string(vertices->at(i)) << endl;
+		cout << glm::to_string(normals->at(i)) << endl;
+	}
 
 	cout << "triangles: " << index->size() / 3 << endl;
 	//Main Loop  
 	do
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		SetupLighting();
 		SetupModelview();
 		SetupProjection();
-		glViewport(0, 0, WIDTH, HEIGHT);
 
 		gluLookAt(g_Eye.x, g_Eye.y, g_Eye.z,
 			g_Center.x, g_Center.y, g_Center.z,
 			g_Up.x, g_Up.y, g_Up.z);
 
 		vec3 aux;
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		//glPolygonMode(GL_FRONT, GL_FILL);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		int n = 0;
-		//glBegin(GL_POINTS);
-		//for (int i = 0; i < vertices->size(); i++){
-		//	vec3 v = vertices->at(i);
-		//	glVertex3f(v.x, v.y, v.z);
+		//int n = 0;
+		//for (int i = 0; i < index->size(); i+=3){
+		//	//cout << "i=" << i * 3+2 << endl;
+		//	glBegin(GL_TRIANGLE_STRIP);
+		//	glNormal3f(normals->at(n).x, normals->at(n).y, normals->at(n).z);		
+		//	aux = vertices->at(index->at(i));
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(index->at(i+1));
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(index->at(i+2));
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	glEnd();
 		//}
-		//glEnd();
+		// with normals
+		//for (int i = 0; i < index->size(); i+=3){
+		//	int ind[] = { index->at(i), index->at(i + 1), index->at(i + 2)};
+		//	glBegin(GL_TRIANGLES);
+
+		//	aux = normals->at(ind[0]);
+		//	glNormal3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(ind[0]);
+		//	glVertex3f(aux.x, aux.y, aux.z);
+		//	
+		//	aux = normals->at(ind[1]);
+		//	glNormal3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(ind[1]);
+		//	glVertex3f(aux.x, aux.y, aux.z);
+
+		//	aux = normals->at(ind[2]);
+		//	glNormal3f(aux.x, aux.y, aux.z);
+		//	aux = vertices->at(ind[2]);
+		//	glVertex3f(aux.x, aux.y, aux.z);
+
+		//	glEnd();
+		//}
+
+		//triangle_t
 		for (int i = 0; i < index->size(); i+=3){
-			//cout << "i=" << i * 3+2 << endl;
-			glBegin(GL_TRIANGLE_STRIP);
-			glNormal3f(normals->at(n).x, normals->at(n).y, normals->at(n).z);			
-			aux = vertices->at(index->at(i));
-			glVertex3f(aux.x, aux.y, aux.z);
-			aux = vertices->at(index->at(i+1));
-			glVertex3f(aux.x, aux.y, aux.z);
-			aux = vertices->at(index->at(i+2));
-			glVertex3f(aux.x, aux.y, aux.z);
+			glBegin(GL_TRIANGLES);
+			int ind[] = { index->at(i), index->at(i + 1), index->at(i + 2)};
+			vertex_t v = verts->at(ind[0]);
+			glNormal3f(v.n.x, v.n.y, v.n.z);
+			glVertex3f(v.v.x, v.v.y, v.v.z);
+			v = verts->at(ind[1]);
+			glNormal3f(v.n.x, v.n.y, v.n.z);
+			glVertex3f(v.v.x, v.v.y, v.v.z);
+			v = verts->at(ind[2]);
+			glNormal3f(v.n.x, v.n.y, v.n.z);
+			glVertex3f(v.v.x, v.v.y, v.v.z);
 			glEnd();
 		}
-
 		//Swap buffers  
 		glfwSwapBuffers(window);
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...  

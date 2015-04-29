@@ -53,7 +53,9 @@ HeightMap::HeightMap(const char* filename){
 int mat2vecIndex(int r, int c, int nc){
 	return (r * nc + c);
 }
-
+/*
+	Generate the mesh and normals
+*/
 void HeightMap::genMesh(BYTE* bits){
 	float scaleFactorX = 1.0f / height;
 	float scaleFactorY =  1.0f / 255.0f;
@@ -96,14 +98,70 @@ void HeightMap::genMesh(BYTE* bits){
 	}
 
 	//normals
-	for (int i = 0; i < mesh->index->size(); i+=3){
-		vec3 v1 = mesh->vertices->at(mesh->index->at(i));
-		vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
-		vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
-		
-		vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
-		mesh->normals->push_back(n1);
+	//for (int i = 0; i < mesh->index->size(); i+=3){
+	//	vec3 v1 = mesh->vertices->at(mesh->index->at(i));
+	//	vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
+	//	vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
+	//	
+	//	vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
+	//	mesh->normals->push_back(n1);
+	//}
+	//////
+
+	for (int i = 0; i < mesh->vertices->size(); i++){
+		mesh->normals->push_back(vec3());
 	}
+	
+	for (int i = 0; i < mesh->index->size(); i+=3){
+		int index[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2)};
+		vec3 v1 = mesh->vertices->at(index[0]);
+		vec3 v2 = mesh->vertices->at(index[1]);
+		vec3 v3 = mesh->vertices->at(index[2]);
+
+		vec3 n = glm::cross(v1 - v2, v1 - v3);
+		mesh->normals->at(index[0]) += n;
+		mesh->normals->at(index[1]) += n;
+		mesh->normals->at(index[2]) += n;
+	}
+	for (int i = 0; i < mesh->normals->size(); i++){ // normalization
+		mesh->normals->at(i) = glm::normalize(mesh->normals->at(i));
+	}
+
+	//transform into vertex_t struct
+	vert_t = new vector<vertex_t>();
+	for (int i = 0; i < mesh->vertices->size(); i++){
+		vec3 v = mesh->vertices->at(i);
+		vec3 n = mesh->normals->at(i);
+		vertex_t t = { v, n };
+		vert_t->push_back(t);
+	}
+}
+
+vector<vertex_t>* HeightMap::getVertices(){
+	return this->vert_t;
+}
+
+void HeightMap::genBuffers(){
+	//GLuint vboID;
+	//glGenBuffers(1, &vboID); // Create the buffer ID, this is basically the same as generating texture ID's
+	//glBindBuffer(GL_ARRAY_BUFFER, vboID); // Bind the buffer (vertex array data)
+
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * mesh->vertices->size(), NULL, GL_STATIC_DRAW);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec3) * mesh->vertices->size(), mesh->vertices); // Actually upload the data
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec3) * mesh->vertices->size(), mesh->vertices); // Actually upload the data
+
+	//glNormalPointer(GL_FLOAT, sizeof(vec3), NULL);
+	//glVertexPointer(3, GL_FLOAT, sizeof(vec3), BUFFEROFFSET(0));
+
+	//GLuint indexVBOID;
+	//glGenBuffers(1, &indexVBOID); // Generate buffer
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBOID); // Bind the element array buffer
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * vertCount, indices, GL_STATIC_DRAW);
+
+
+	//vVboIDs = vboID;
+	//iVboIDs = indexVBOID;
+	//vboSize = vertCount;
 }
 
 Mesh* HeightMap::getMesh(){
