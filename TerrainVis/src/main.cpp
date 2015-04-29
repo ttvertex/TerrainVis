@@ -178,12 +178,12 @@ int main(void)
 	vector<vec3>* normals = mesh->normals;
 	vector<int>* index = mesh->index;
 
-	/*for (int i = 0; i < 10; i++){
-		cout << endl;
-		cout << index->at(i) << endl;
-		cout << glm::to_string(vertices->at(i)) << endl;
-		cout << glm::to_string(normals->at(i)) << endl;
-	}*/
+	//for (int i = 0; i < 10; i++){
+	//	cout << endl;
+	//	cout << index->at(i) << endl;
+	//	cout << glm::to_string(vertices->at(i)) << endl;
+	//	cout << glm::to_string(normals->at(i)) << endl;
+	//}
 
 	cout << "triangles: " << index->size() / 3 << endl;
 	//Main Loop  
@@ -212,7 +212,7 @@ int main(void)
 		//glEnd();
 		for (int i = 0; i < index->size(); i+=3){
 			//cout << "i=" << i * 3+2 << endl;
-			glBegin(GL_TRIANGLES);
+			glBegin(GL_TRIANGLE_STRIP);
 			glNormal3f(normals->at(n).x, normals->at(n).y, normals->at(n).z);			
 			aux = vertices->at(index->at(i));
 			glVertex3f(aux.x, aux.y, aux.z);

@@ -55,14 +55,17 @@ int mat2vecIndex(int r, int c, int nc){
 }
 
 void HeightMap::genMesh(BYTE* bits){
-	cout << "(" << width << "," << height << ")" << endl;
-
 	float scaleFactorX = 1.0f / height;
 	float scaleFactorY =  1.0f / 255.0f;
 	float scaleFactorZ = 1.0f / width;
 	
 	// Length of one row in data
 	unsigned int row_step = ptr_inc * width;
+	/* --ptr_inc -  by how much we need to increase data pointer to move by one height value in data - 
+		point is, that when we have for example 24 - bit image, for now we would only care for R value 
+		as the value with intensity, and we need to move 3 bytes from current pointer position to point
+		at next value, but if we have 8 -  it image(our case), we need to move by 1 byte only
+	  --row_step - the width of one row in memory, it's just number of columns multiplied by ptr_inc */
 
 	// vertices
 	for (int i = 0; i < height; i++){
@@ -76,7 +79,6 @@ void HeightMap::genMesh(BYTE* bits){
 			mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR));
 		}
 	}
-	// load vertices from heights data
 	
 	// gen index - seems to be working
 	for (int i = 0; i < height-1; i++){
@@ -94,31 +96,13 @@ void HeightMap::genMesh(BYTE* bits){
 	}
 
 	//normals
-	cout << "indexsize" << mesh->index->size() << endl;
-	cout << "vsize" << mesh->vertices->size() << endl;
-	//for (int i = 0; i < mesh->index->size(); i+=3){
-	//	vec3 v1 = mesh->vertices->at(mesh->index->at(i));
-	//	vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
-	//	vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
-	//	
-	//	vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
-	//	mesh->normals->push_back(n1);
-	//}
-	
-	for (int i = 0; i < height - 1; i++){
-		for (int j = 0; j < width - 1; j++){
-
-			vec3 v1 = mesh->vertices->at(mat2vecIndex(i, j, width));
-			vec3 v2 = mesh->vertices->at(mat2vecIndex(i + 1, j, width));
-			vec3 v3 = mesh->vertices->at(mat2vecIndex(i + 1, j + 1, width));
-			vec3 v4 = mesh->vertices->at(mat2vecIndex(i, j + 1, width));
-
-			vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
-			vec3 n2 = glm::normalize(cross(v4 - v1, v4 - v3));
-
-			mesh->normals->push_back(n1);
-			mesh->normals->push_back(n2);
-		}
+	for (int i = 0; i < mesh->index->size(); i+=3){
+		vec3 v1 = mesh->vertices->at(mesh->index->at(i));
+		vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
+		vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
+		
+		vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
+		mesh->normals->push_back(n1);
 	}
 }
 

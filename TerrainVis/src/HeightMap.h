@@ -15,6 +15,7 @@
 #include "FreeImage.h"
 #include <map>
 #include "glm\glm.hpp"
+#include "glm\gtx\string_cast.hpp"
 
 using namespace std;
 using namespace glm;
