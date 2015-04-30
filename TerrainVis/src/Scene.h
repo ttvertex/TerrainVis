@@ -27,6 +27,11 @@ public:
 	*/
 	virtual void resize(int, int) = 0;
 
+	virtual void keyCallback(int key, int scancode, int action, int mods) = 0;
+	virtual void mouseButtonCallback(int btn, int action, int mods) = 0;
+	virtual void mouseScrollCallback(int offx, int offy) = 0;
+	virtual void mouseMotionCallback(float x, float y) = 0;
+
 protected:
 
 };

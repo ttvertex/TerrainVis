@@ -13,11 +13,21 @@ using std::string;
 Scene *scene;
 GLFWwindow *window;
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_W && action == GLFW_REPEAT){
-		
-	}
+	scene->keyCallback(key, scancode, action, mods);
+}
+
+void mouse_motion_callback(GLFWwindow* window, float x, float y){
+	scene->mouseMotionCallback(x,y);
+}
+
+void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
+	scene->mouseButtonCallback(btn, action, mods);
+}
+
+void mouseScrollCB(GLFWwindow* window, double offx, double offy){
+	scene->mouseScrollCallback(offx, offy);
 }
 
 void initializeGL() {
@@ -60,7 +70,10 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	glfwMakeContextCurrent(window);
-	//glfwSetKeyCallback(window, key_callback);
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, GLFWcursorposfun(mouse_motion_callback));
+	glfwSetMouseButtonCallback(window, GLFWmousebuttonfun(mouseButtonCB));
+	glfwSetScrollCallback(window, GLFWscrollfun(mouseScrollCB));
 
 	// Load the OpenGL functions.
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED) {

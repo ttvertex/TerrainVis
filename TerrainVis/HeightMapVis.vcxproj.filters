@@ -7,6 +7,7 @@
     <ClCompile Include="src\glutils.cpp" />
     <ClCompile Include="src\SceneBasic.cpp" />
     <ClCompile Include="src\glslprogram.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="README.txt" />
@@ -23,6 +24,7 @@
     <ClInclude Include="src\glutils.h" />
     <ClInclude Include="src\SceneBasic.h" />
     <ClInclude Include="src\glslprogram.h" />
+    <ClInclude Include="src\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic.frag" />

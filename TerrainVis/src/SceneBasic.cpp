@@ -13,16 +13,20 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "Camera.h"
+
 #define _DEBUG
 
 using namespace std;
 using std::ifstream;
 using std::string;
 using glm::mat4;
+Camera* camera;
 
 SceneBasic::SceneBasic(GLFWwindow* window) {
 	this->window = window;
-
+	camera = new Camera();
+	
 	// init matrices
 	model = glm::mat4(1.0f);
 	view = glm::lookAt(
@@ -97,13 +101,16 @@ void SceneBasic::initScene()
 void SceneBasic::setUpMatrices(){
 	//model *= glm::translate(vec3(0.0f, 0.001f, 0.0f)); //push up
 	//model *= glm::rotate(0.01f,vec3(1.0f, 1.0f, 0.0f)); //rotate xz
+	view = camera->Look();
 	model = glm::translate(vec3(0.0f, 0.0f, 1.0f)); // push back
 	mvpMat = projection * view * model;
 	prog.setUniform("ModelViewMatrix", mvpMat);
+
 }
 
 void SceneBasic::update(float t)
 {
+	camera->Update();
 	setUpMatrices();
 	//...
 }
@@ -122,4 +129,31 @@ void SceneBasic::resize(int w, int h)
 	width = w;
 	height = h;
 	projection = glm::perspective(glm::radians(60.0f), (float)w / h, 0.3f, 100.0f);
+}
+
+
+// callbacks
+void SceneBasic::keyCallback(int key, int scancode, int action, int mods)
+{
+	cout << "key " << endl;
+	if (key == GLFW_KEY_W && action == GLFW_REPEAT){
+
+	}
+}
+
+void SceneBasic::mouseButtonCallback(int btn, int action, int mods){
+	
+}
+
+void SceneBasic::mouseScrollCallback(int offx, int offy){
+	if (offy == -1){
+		view *= glm::translate(vec3(0.0f, 0.0f, 0.5f));
+	}
+	else if (offy == 1){
+		view *= glm::translate(vec3(0.0f, 0.0f, -0.5f));
+	}
+	view = camera->Look();
+}
+void SceneBasic::mouseMotionCallback(float x, float y){
+	
 }

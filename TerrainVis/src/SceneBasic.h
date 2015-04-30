@@ -29,7 +29,12 @@ public:
 	void update(float t);
 	void render();
 	void resize(int, int);
-	
+
+	//callbacks
+	void keyCallback(int key, int scancode, int action, int mods);
+	void mouseButtonCallback(int btn, int action, int mods);
+	void mouseScrollCallback(int offx, int offy);
+	void mouseMotionCallback(float x, float y);	
 };
 
 #endif // SCENEBASIC_H
