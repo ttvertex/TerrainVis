@@ -15,8 +15,7 @@ public:
 	void Update(double deltaTime);
 	glm::mat4 Look();
 
-	void SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight);
-	void ResetMouse();
+	void SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight);	
 
 	// Functions that get viewing angles
 	float GetAngleX(), GetAngleY();

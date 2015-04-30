@@ -39,11 +39,14 @@ camera.
 
 void Camera::RotateWithMouse()
 {
+	int left, top, right, bottom;
+	glfwGetWindowFrameSize(window, &left, &top, &right, &bottom);
 	glfwGetCursorPos(window, &mouseX, &mouseY);
-	int iCentX = 250;
-	int iCentY = 250;
-	float deltaX = (float)(iCentX - mouseX)*fSensitivity;
-	float deltaY = (float)(iCentY - mouseY)*fSensitivity;
+	
+	float iCentX = (left + right) >> 1;
+	float iCentY =  (top + bottom) >> 1;
+	float deltaX = (iCentX - float(mouseX)) * fSensitivity;
+	float deltaY = (iCentY - float(mouseY)) * fSensitivity;
 
 	if (deltaX != 0.0f)
 	{
@@ -64,7 +67,7 @@ void Camera::RotateWithMouse()
 			vView += vEye;
 		}
 	}
-	glfwSetCursorPos(window, 0, 0);
+	glfwSetCursorPos(window, iCentX, iCentY);
 }
 
 /*-----------------------------------------------
@@ -143,7 +146,7 @@ rotating.
 
 void Camera::Update(double deltaTime)
 {
-	//RotateWithMouse();
+	RotateWithMouse();
 
 	// Get view direction
 	glm::vec3 vMove = vView - vEye;
@@ -167,29 +170,6 @@ void Camera::Update(double deltaTime)
 		vMoveBy += vStrafe * float(deltaTime);
 	vEye += vMoveBy; 
 	vView += vMoveBy;
-}
-
-/*-----------------------------------------------
-
-Name:	ResetMouse
-
-Params:	none
-
-Result:	Sets mouse cursor back to the center of
-window.
-
-/*---------------------------------------------*/
-
-void Camera::ResetMouse()
-{
-	//RECT rRect; 
-	//rRect.left = 0;
-	//rRect.right = 500;
-	//rRect.top = 0;
-	//rRect.bottom = 500;
-	//int iCentX = (rRect.left + rRect.right) >> 1,
-	//	iCentY = (rRect.top + rRect.bottom) >> 1;
-	//SetCursorPos(iCentX, iCentY);
 }
 
 /*-----------------------------------------------
