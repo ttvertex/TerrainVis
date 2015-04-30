@@ -105,7 +105,6 @@ void SceneBasic::setUpMatrices(){
 	model = glm::translate(vec3(0.0f, 0.0f, 1.0f)); // push back
 	mvpMat = projection * view * model;
 	prog.setUniform("ModelViewMatrix", mvpMat);
-
 }
 
 void SceneBasic::update(double deltaTime)

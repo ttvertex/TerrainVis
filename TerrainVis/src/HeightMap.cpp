@@ -115,6 +115,7 @@ void HeightMap::genMesh(BYTE* bits){
 			float fScaleR = float(i) / float(height - 1);
 			float fVertexHeight = float(*(bits + row_step * i + j * ptr_inc)) / 255.0f;
 			mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR));
+			//mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, 0.0f, -0.5f + fScaleR));
 		}
 	}
 	
@@ -285,52 +286,78 @@ void HeightMap::genBuffers(){
 		20, 21, 22, 20, 22, 23
 	};
 
-	glGenVertexArrays(1, &vaoID);
-	glBindVertexArray(vaoID);
-
-	unsigned int handle[4];
-	glGenBuffers(4, handle);
-
-	glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-	glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), v, GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	glEnableVertexAttribArray(0);  // Vertex position
-
-	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), n, GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	glEnableVertexAttribArray(1);  // Vertex normal
-
-	glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-	glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	glEnableVertexAttribArray(2);  // texture coords
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), el, GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-
 	//glGenVertexArrays(1, &vaoID);
 	//glBindVertexArray(vaoID);
 
-	//unsigned int handle[3];
-	//glGenBuffers(3, handle);
+	//unsigned int handle[4];
+	//glGenBuffers(4, handle);
 
 	//glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-	//glBufferData(GL_ARRAY_BUFFER, mesh->vertices->size() * sizeof(glm::vec3), (GLvoid*)&mesh->vertices[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), v, GL_STATIC_DRAW);
 	//glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
 	//glEnableVertexAttribArray(0);  // Vertex position
 
 	//glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	//glBufferData(GL_ARRAY_BUFFER, mesh->normals->size() * sizeof(glm::vec3), (GLvoid*)&mesh->normals[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), n, GL_STATIC_DRAW);
 	//glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
 	//glEnableVertexAttribArray(1);  // Vertex normal
 
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index->size() * sizeof(GLuint), (GLvoid*)&mesh->index[0], GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
+	//glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
+	//glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	//glEnableVertexAttribArray(2);  // texture coords
+
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), el, GL_STATIC_DRAW);
 
 	//glBindVertexArray(0);
+
+	//glGenVertexArrays(1, &vaoID);
+	//glBindVertexArray(vaoID);
+
+	//unsigned int handle[4];
+	//glGenBuffers(3, handle);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), v, GL_STATIC_DRAW);
+	//glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	//glEnableVertexAttribArray(0);  // Vertex position
+
+	//glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), n, GL_STATIC_DRAW);
+	//glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	//glEnableVertexAttribArray(1);  // Vertex normal
+
+	////glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
+	////glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
+	////glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	////glEnableVertexAttribArray(2);  // texture coords
+
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), el, GL_STATIC_DRAW);
+
+	//glBindVertexArray(0);
+
+	glGenVertexArrays(1, &vaoID);
+	glBindVertexArray(vaoID);
+
+	unsigned int handle[3];
+	glGenBuffers(3, handle);
+
+	glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+	glBufferData(GL_ARRAY_BUFFER, mesh->vertices->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->vertices)[0], GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(0);  // Vertex position
+
+	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+	glBufferData(GL_ARRAY_BUFFER, mesh->normals->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->normals)[0], GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(1);  // Vertex normal
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index->size() * sizeof(GLuint), (GLvoid*)&(*mesh->index)[0], GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
 }
 
 void HeightMap::update(double deltaTime){
@@ -349,9 +376,84 @@ void HeightMap::handleInput(){
 void HeightMap::resize(int x, int y){
 	
 }
+typedef struct
+{
+	GLfloat v[3]; //xyz
+	GLfloat n[3]; //xyz
+}vertex_t;
+vector<vertex_t> vertices;
+vector<int> indices;
+void gen(uint qual){
+	vertex_t v;
+
+	double tetaStep = (2 * glm::pi<float>()) / (double)qual;
+	double fiiStep = glm::pi<float>() / (double)qual;
+
+	int tetacount = 0;
+	int fiicount = 0;
+
+	/// Generates vetrice data
+	for (double teta = 0.0; teta <= (2 * glm::pi<float>()); teta += tetaStep)
+	{
+		tetacount++;
+		fiicount = 0;
+		for (double fii = 0.0; fii < glm::pi<float>(); fii += fiiStep)
+		{
+			v.v[0] = cos(teta) * sin(fii);
+			v.v[1] = sin(teta) * sin(fii);
+			v.v[2] = cos(fii);
+			v.n[0] = v.v[0];
+			v.n[1] = v.v[1];
+			v.n[2] = v.v[2];
+
+			vertices.push_back(v);
+			fiicount++;
+			if (fiicount >= qual)
+				break;
+		}
+		v.v[0] = cos(teta) * sin(glm::pi<float>());
+		v.v[1] = sin(teta) * sin(glm::pi<float>());
+		v.v[2] = cos(glm::pi<float>());
+		v.n[0] = v.v[0];
+		v.n[1] = v.v[1];
+		v.n[2] = v.v[2];
+
+		vertices.push_back(v);
+		if (tetacount > qual)
+			break;
+	}
+
+	/// Make indexes
+	int qualMaisUm = qual + 1;
+	for (int i = 0; i < qual - 1; i++)
+	{
+		for (int j = 0; j < qualMaisUm - 1; j++)
+		{
+			indices.push_back(i       * qualMaisUm + j);
+			indices.push_back((i + 1) * qualMaisUm + j + 1);
+			indices.push_back((i + 1) * qualMaisUm + j);
+
+			indices.push_back(i       * qualMaisUm + j);
+			indices.push_back(i       * qualMaisUm + j + 1);
+			indices.push_back((i + 1) * qualMaisUm + j + 1);
+		}
+	}
+	for (int i = 0; i < qual; i++)
+	{
+		indices.push_back((qual - 1)  * qualMaisUm + i);
+		indices.push_back(0 + i + 1);
+		indices.push_back(0 + i);
+
+		indices.push_back((qual - 1) * qualMaisUm + i);
+		indices.push_back((qual - 1) * qualMaisUm + i + 1);
+		indices.push_back(0 + i + 1);
+	}
+}
 
 void HeightMap::render(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_TRIANGLES, mesh->index->size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 }
+
