@@ -1,7 +1,11 @@
 #include "HeightMap.h"
 
 
-HeightMap::HeightMap(const char* filename){
+HeightMap::HeightMap(GLFWwindow* window, const char* filename){
+	this->filename = filename;
+}
+
+void HeightMap::initScene(){
 	//image format
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	//pointer to the image, once loaded
@@ -48,7 +52,7 @@ HeightMap::HeightMap(const char* filename){
 	genBuffers();
 
 	//Free FreeImage's copy of the data
-	FreeImage_Unload(dib);	
+	FreeImage_Unload(dib);
 }
 
 int mat2vecIndex(int r, int c, int nc){
@@ -128,40 +132,185 @@ void HeightMap::genMesh(BYTE* bits){
 		mesh->normals->at(i) = glm::normalize(mesh->normals->at(i));
 	}
 
-	//transform into vertex_t struct
-	vert_t = new vector<vertex_t>();
-	for (int i = 0; i < mesh->vertices->size(); i++){
-		vec3 v = mesh->vertices->at(i);
-		vec3 n = mesh->normals->at(i);
-		vertex_t t = { v, n };
-		vert_t->push_back(t);
-	}
+	////transform into vertex_t struct
+	//vert_t = new vector<vertex_t>();
+	//for (int i = 0; i < mesh->vertices->size(); i++){
+	//	vec3 v = mesh->vertices->at(i);
+	//	vec3 n = mesh->normals->at(i);
+	//	vertex_t t = { v, n };
+	//	vert_t->push_back(t);
+	//}
 }
 
-vector<vertex_t>* HeightMap::getVertices(){
-	return this->vert_t;
-}
 void HeightMap::genBuffers(){
+	float side = 1.0f;
+	float side2 = side / 2.0f;
+
+	float v[24 * 3] = {
+		// Front
+		-side2, -side2, side2,
+		side2, -side2, side2,
+		side2, side2, side2,
+		-side2, side2, side2,
+		// Right
+		side2, -side2, side2,
+		side2, -side2, -side2,
+		side2, side2, -side2,
+		side2, side2, side2,
+		// Back
+		-side2, -side2, -side2,
+		-side2, side2, -side2,
+		side2, side2, -side2,
+		side2, -side2, -side2,
+		// Left
+		-side2, -side2, side2,
+		-side2, side2, side2,
+		-side2, side2, -side2,
+		-side2, -side2, -side2,
+		// Bottom
+		-side2, -side2, side2,
+		-side2, -side2, -side2,
+		side2, -side2, -side2,
+		side2, -side2, side2,
+		// Top
+		-side2, side2, side2,
+		side2, side2, side2,
+		side2, side2, -side2,
+		-side2, side2, -side2
+	};
+
+	float n[24 * 3] = {
+		// Front
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		// Right
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		// Back
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, -1.0f,
+		// Left
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		// Bottom
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		// Top
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f
+	};
+
+	float tex[24 * 2] = {
+		// Front
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		// Right
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		// Back
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		// Left
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		// Bottom
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		// Top
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f
+	};
+
+	GLuint el[] = {
+		0, 1, 2, 0, 2, 3,
+		4, 5, 6, 4, 6, 7,
+		8, 9, 10, 8, 10, 11,
+		12, 13, 14, 12, 14, 15,
+		16, 17, 18, 16, 18, 19,
+		20, 21, 22, 20, 22, 23
+	};
+
+	GLuint vaoHandle;
+	glGenVertexArrays(1, &vaoHandle);
+	glBindVertexArray(vaoHandle);
+	vaoID = vaoHandle;
+	unsigned int handle[4];
+	glGenBuffers(4, handle);
+
+	glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+	glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), v, GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(0);  // Vertex position
+
+	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+	glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), n, GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(1);  // Vertex normal
+
+	glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
+	glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(2);  // texture coords
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), el, GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+
+	//glGenVertexArrays(1, &vaoID);
+	//glBindVertexArray(vaoID);
+
+	//unsigned int handle[3];
+	//glGenBuffers(3, handle);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+	//glBufferData(GL_ARRAY_BUFFER, mesh->vertices->size() * sizeof(glm::vec3), (GLvoid*)&mesh->vertices[0], GL_STATIC_DRAW);
+	//glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	//glEnableVertexAttribArray(0);  // Vertex position
+
+	//glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+	//glBufferData(GL_ARRAY_BUFFER, mesh->normals->size() * sizeof(glm::vec3), (GLvoid*)&mesh->normals[0], GL_STATIC_DRAW);
+	//glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	//glEnableVertexAttribArray(1);  // Vertex normal
+
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index->size() * sizeof(GLuint), (GLvoid*)&mesh->index[0], GL_STATIC_DRAW);
+
+	//glBindVertexArray(0);
+}
+
+void HeightMap::update(double deltaTime){
+
+}
+void HeightMap::resize(int x, int y){
+	
 }
 
 void HeightMap::render(){
-	//triangle_t
-	for (int i = 0; i < mesh->index->size(); i+=3){
-		glBegin(GL_TRIANGLES);
-		int ind[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2) };
-		vertex_t v = vert_t->at(ind[0]);
-		glNormal3f(v.n.x, v.n.y, v.n.z);
-		glVertex3f(v.v.x, v.v.y, v.v.z);
-		v = vert_t->at(ind[1]);
-		glNormal3f(v.n.x, v.n.y, v.n.z);
-		glVertex3f(v.v.x, v.v.y, v.v.z);
-		v = vert_t->at(ind[2]);
-		glNormal3f(v.n.x, v.n.y, v.n.z);
-		glVertex3f(v.v.x, v.v.y, v.v.z);
-		glEnd();
-	}
-}
-
-Mesh* HeightMap::getMesh(){
-	return mesh;
+	glBindVertexArray(vaoID);
+	glDrawElements(GL_TRIANGLES, mesh->index->size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 }

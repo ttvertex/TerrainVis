@@ -110,6 +110,7 @@ void SceneBasic::setUpMatrices(){
 
 void SceneBasic::update(double deltaTime)
 {
+	handleInput();
 	camera->Update(deltaTime);
 	setUpMatrices();
 	//...
@@ -131,29 +132,9 @@ void SceneBasic::resize(int w, int h)
 	projection = glm::perspective(glm::radians(60.0f), (float)w / h, 0.3f, 100.0f);
 }
 
-
-// callbacks
-void SceneBasic::keyCallback(int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_W && action == GLFW_REPEAT){
-
-	}
-}
-
-void SceneBasic::mouseButtonCallback(int btn, int action, int mods){
+/**
+	mouse and keyboard input
+*/
+void SceneBasic::handleInput(){
 	
-}
-
-void SceneBasic::mouseScrollCallback(int offx, int offy){
-	//if (offy == -1){
-	//	view *= glm::translate(vec3(0.0f, 0.0f, 0.5f));
-	//}
-	//else if (offy == 1){
-	//	view *= glm::translate(vec3(0.0f, 0.0f, -0.5f));
-	//}
-	//view = camera->Look();
-}
-void SceneBasic::mouseMotionCallback(double x, double y){
-	mousePos.x = x;
-	mousePos.y = y;
 }

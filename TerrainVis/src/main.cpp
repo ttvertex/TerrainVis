@@ -9,6 +9,9 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include "HeightMap.h"
+#include <gl\glew.h>
+
 using std::string;
 using namespace std;
 
@@ -17,19 +20,19 @@ GLFWwindow *window;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	scene->keyCallback(key, scancode, action, mods);
+	
 }
 
 void mouse_motion_callback(GLFWwindow* window, double x, double y){
-	scene->mouseMotionCallback(x,y);
+	
 }
 
 void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
-	scene->mouseButtonCallback(btn, action, mods);
+	
 }
 
 void mouseScrollCB(GLFWwindow* window, double offx, double offy){
-	scene->mouseScrollCallback(offx, offy);
+	
 }
 
 void initializeGL() {
@@ -61,6 +64,7 @@ int main(int argc, char *argv[])
 
 	// Initialize GLFW
 	if (!glfwInit()) exit(EXIT_FAILURE);
+	
 
 	// Select OpenGL 4.3 with a forward compatible core profile.
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -72,7 +76,7 @@ int main(int argc, char *argv[])
 	
 	// Open the window
 	string title = "TerrainVis by tengel";
-	window = glfwCreateWindow(500, 500, title.c_str(), NULL, NULL);
+	window = glfwCreateWindow(1000, 1000, title.c_str(), NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
@@ -93,7 +97,8 @@ int main(int argc, char *argv[])
 
 	GLUtils::dumpGLInfo();
 
-	scene = new SceneBasic(window);
+	//scene = new SceneBasic(window);
+	scene = new HeightMap(window, "resources/terrain.jpg");
 
 	// Initialization
 	initializeGL();

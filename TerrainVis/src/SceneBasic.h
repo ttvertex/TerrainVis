@@ -22,6 +22,7 @@ private:
 	glm::mat4 projection;
 	glm::mat4 mvpMat;
 
+	void handleInput();
 	void setUpMatrices();
 	GLFWwindow* window;
 public:
@@ -30,13 +31,7 @@ public:
 	void initScene();
 	void update(double t);
 	void render();
-	void resize(int, int);
-
-	//callbacks
-	void keyCallback(int key, int scancode, int action, int mods);
-	void mouseButtonCallback(int btn, int action, int mods);
-	void mouseScrollCallback(int offx, int offy);
-	void mouseMotionCallback(double x, double y);	
+	void resize(int, int);	
 };
 
 #endif // SCENEBASIC_H
