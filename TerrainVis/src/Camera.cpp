@@ -1,15 +1,20 @@
 #include "Camera.h"
 
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <iostream>
+using namespace std;
 
 const float PI = float(atan(1.0)*4.0);
 
-Camera::Camera()
+Camera::Camera(GLFWwindow* window)
 {
+	this->window = window;
 	vEye = glm::vec3(0.0f, 0.0f, 0.0f);
 	vView = glm::vec3(0.0f, 0.0, -1.0f);
 	vUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	fSpeed = 25.0f;
+	fSpeed = 5.0f;
 	fSensitivity = 0.01f;
 	this->SetMovingKeys('W', 'S', 'A', 'D');
 }
@@ -34,17 +39,11 @@ camera.
 
 void Camera::RotateWithMouse()
 {
-	GetCursorPos(&pCur);
-	RECT rRect; 
-	rRect.left = 0;
-	rRect.right = 500;
-	rRect.top = 0;
-	rRect.bottom = 500;
-	int iCentX = (rRect.left + rRect.right) >> 1,
-		iCentY = (rRect.top + rRect.bottom) >> 1;
-
-	float deltaX = (float)(iCentX - pCur.x)*fSensitivity;
-	float deltaY = (float)(iCentY - pCur.y)*fSensitivity;
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+	int iCentX = 250;
+	int iCentY = 250;
+	float deltaX = (float)(iCentX - mouseX)*fSensitivity;
+	float deltaY = (float)(iCentY - mouseY)*fSensitivity;
 
 	if (deltaX != 0.0f)
 	{
@@ -65,7 +64,7 @@ void Camera::RotateWithMouse()
 			vView += vEye;
 		}
 	}
-	//SetCursorPos(iCentX, iCentY);
+	glfwSetCursorPos(window, 0, 0);
 }
 
 /*-----------------------------------------------
@@ -142,9 +141,9 @@ rotating.
 
 /*---------------------------------------------*/
 
-void Camera::Update()
+void Camera::Update(double deltaTime)
 {
-	RotateWithMouse();
+	//RotateWithMouse();
 
 	// Get view direction
 	glm::vec3 vMove = vView - vEye;
@@ -157,11 +156,15 @@ void Camera::Update()
 
 	int iMove = 0;
 	glm::vec3 vMoveBy;
-	// Get vector of move
-	//if (Keys::Key(iForw))vMoveBy += vMove*appMain.sof(1.0f);
-	//if (Keys::Key(iBack))vMoveBy -= vMove*appMain.sof(1.0f);
-	//if (Keys::Key(iLeft))vMoveBy -= vStrafe*appMain.sof(1.0f);
-	//if (Keys::Key(iRight))vMoveBy += vStrafe*appMain.sof(1.0f);
+	 //Get vector of move
+	if (glfwGetKey(window, iForw))
+		vMoveBy += vMove * float(deltaTime);
+	if (glfwGetKey(window, iBack))
+		vMoveBy -= vMove * float(deltaTime);
+	if (glfwGetKey(window, iLeft))
+		vMoveBy -= vStrafe * float(deltaTime);
+	if (glfwGetKey(window, iRight))
+		vMoveBy += vStrafe * float(deltaTime);
 	vEye += vMoveBy; 
 	vView += vMoveBy;
 }
@@ -179,14 +182,14 @@ window.
 
 void Camera::ResetMouse()
 {
-	RECT rRect; 
-	rRect.left = 0;
-	rRect.right = 500;
-	rRect.top = 0;
-	rRect.bottom = 500;
-	int iCentX = (rRect.left + rRect.right) >> 1,
-		iCentY = (rRect.top + rRect.bottom) >> 1;
-	SetCursorPos(iCentX, iCentY);
+	//RECT rRect; 
+	//rRect.left = 0;
+	//rRect.right = 500;
+	//rRect.top = 0;
+	//rRect.bottom = 500;
+	//int iCentX = (rRect.left + rRect.right) >> 1,
+	//	iCentY = (rRect.top + rRect.bottom) >> 1;
+	//SetCursorPos(iCentX, iCentY);
 }
 
 /*-----------------------------------------------

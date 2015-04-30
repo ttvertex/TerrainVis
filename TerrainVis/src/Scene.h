@@ -15,7 +15,7 @@ public:
 	This is called prior to every frame.  Use this
 	to update your animation.
 	*/
-	virtual void update(float t) = 0;
+	virtual void update(double t) = 0;
 
 	/**
 	Draw your scene.
@@ -30,7 +30,7 @@ public:
 	virtual void keyCallback(int key, int scancode, int action, int mods) = 0;
 	virtual void mouseButtonCallback(int btn, int action, int mods) = 0;
 	virtual void mouseScrollCallback(int offx, int offy) = 0;
-	virtual void mouseMotionCallback(float x, float y) = 0;
+	virtual void mouseMotionCallback(double x, double y) = 0;
 
 protected:
 

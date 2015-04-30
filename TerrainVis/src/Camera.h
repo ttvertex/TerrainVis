@@ -12,7 +12,7 @@ public:
 
 	// Main functions
 	void RotateWithMouse();
-	void Update();
+	void Update(double deltaTime);
 	glm::mat4 Look();
 
 	void SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight);
@@ -22,10 +22,11 @@ public:
 	float GetAngleX(), GetAngleY();
 
 	// Constructors
-	Camera();
+	Camera(GLFWwindow* window);
 	Camera(glm::vec3 a_vEye, glm::vec3 a_vView, glm::vec3 a_vUp, float a_fSpeed, float a_fSensitivity);
 
 private:
-	POINT pCur; // For mosue rotation
-	int iForw, iBack, iLeft, iRight;
+	GLFWwindow* window;
+	char iForw, iBack, iLeft, iRight;
+	double mouseX, mouseY;
 };

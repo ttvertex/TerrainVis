@@ -15,6 +15,8 @@ private:
 	GLuint vaoHandle;
 	GLSLProgram prog;
 
+	glm::vec2 mousePos;
+
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
@@ -26,7 +28,7 @@ public:
 	SceneBasic(GLFWwindow* window);
 
 	void initScene();
-	void update(float t);
+	void update(double t);
 	void render();
 	void resize(int, int);
 
@@ -34,7 +36,7 @@ public:
 	void keyCallback(int key, int scancode, int action, int mods);
 	void mouseButtonCallback(int btn, int action, int mods);
 	void mouseScrollCallback(int offx, int offy);
-	void mouseMotionCallback(float x, float y);	
+	void mouseMotionCallback(double x, double y);	
 };
 
 #endif // SCENEBASIC_H

@@ -25,7 +25,7 @@ Camera* camera;
 
 SceneBasic::SceneBasic(GLFWwindow* window) {
 	this->window = window;
-	camera = new Camera();
+	camera = new Camera(window);
 	
 	// init matrices
 	model = glm::mat4(1.0f);
@@ -108,9 +108,9 @@ void SceneBasic::setUpMatrices(){
 
 }
 
-void SceneBasic::update(float t)
+void SceneBasic::update(double deltaTime)
 {
-	camera->Update();
+	camera->Update(deltaTime);
 	setUpMatrices();
 	//...
 }
@@ -135,7 +135,6 @@ void SceneBasic::resize(int w, int h)
 // callbacks
 void SceneBasic::keyCallback(int key, int scancode, int action, int mods)
 {
-	cout << "key " << endl;
 	if (key == GLFW_KEY_W && action == GLFW_REPEAT){
 
 	}
@@ -146,14 +145,15 @@ void SceneBasic::mouseButtonCallback(int btn, int action, int mods){
 }
 
 void SceneBasic::mouseScrollCallback(int offx, int offy){
-	if (offy == -1){
-		view *= glm::translate(vec3(0.0f, 0.0f, 0.5f));
-	}
-	else if (offy == 1){
-		view *= glm::translate(vec3(0.0f, 0.0f, -0.5f));
-	}
-	view = camera->Look();
+	//if (offy == -1){
+	//	view *= glm::translate(vec3(0.0f, 0.0f, 0.5f));
+	//}
+	//else if (offy == 1){
+	//	view *= glm::translate(vec3(0.0f, 0.0f, -0.5f));
+	//}
+	//view = camera->Look();
 }
-void SceneBasic::mouseMotionCallback(float x, float y){
-	
+void SceneBasic::mouseMotionCallback(double x, double y){
+	mousePos.x = x;
+	mousePos.y = y;
 }

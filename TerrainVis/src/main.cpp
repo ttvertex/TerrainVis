@@ -6,9 +6,11 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 using std::string;
+using namespace std;
 
 Scene *scene;
 GLFWwindow *window;
@@ -18,7 +20,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	scene->keyCallback(key, scancode, action, mods);
 }
 
-void mouse_motion_callback(GLFWwindow* window, float x, float y){
+void mouse_motion_callback(GLFWwindow* window, double x, double y){
 	scene->mouseMotionCallback(x,y);
 }
 
@@ -36,8 +38,14 @@ void initializeGL() {
 }
 
 void mainLoop() {
+	double thisTime;
+	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-		scene->update(float(glfwGetTime()));
+		
+		thisTime = glfwGetTime();
+		scene->update(thisTime - lastTime);
+		lastTime = thisTime;
+
 		scene->render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -61,7 +69,7 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-
+	
 	// Open the window
 	string title = "TerrainVis by tengel";
 	window = glfwCreateWindow(500, 500, title.c_str(), NULL, NULL);
@@ -69,6 +77,8 @@ int main(int argc, char *argv[])
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPos(window, 0, 0);
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, GLFWcursorposfun(mouse_motion_callback));
