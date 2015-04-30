@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	glfwSetCursorPosCallback(window, GLFWcursorposfun(mouse_motion_callback));
 	glfwSetMouseButtonCallback(window, GLFWmousebuttonfun(mouseButtonCB));
 	glfwSetScrollCallback(window, GLFWscrollfun(mouseScrollCB));
-
+	
 	// Load the OpenGL functions.
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED) {
 		glfwTerminate();
@@ -102,6 +102,9 @@ int main(int argc, char *argv[])
 
 	// Initialization
 	initializeGL();
+
+	glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT_AND_BACK);
 
 	// Enter the main loop
 	mainLoop();

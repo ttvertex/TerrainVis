@@ -1,11 +1,40 @@
 #include "HeightMap.h"
+#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include "glutils.h"
 
+using namespace std;
 
 HeightMap::HeightMap(GLFWwindow* window, const char* filename){
+	this->window = window;
 	this->filename = filename;
+	this->model = mat4(1.0f);
+	this->view = mat4(1.0f);
+	this->projection = glm::perspective(glm::radians(60.0f), 1.0f, 0.01f, 1000.0f);
 }
 
 void HeightMap::initScene(){
+	camera = new Camera(window);
+	loadImage();
+	genMesh(rawImage);
+	genBuffers();
+
+	// load shaders
+	try {
+		prog.compileShader("shader/basic.vert");
+		prog.compileShader("shader/basic.frag");
+		prog.link();
+		prog.use();
+	}
+	catch (GLSLProgramException &e) {
+		cerr << e.what() << endl;
+		exit(EXIT_FAILURE);
+	}
+	prog.printActiveAttribs();
+}
+
+void HeightMap::loadImage(){
 	//image format
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	//pointer to the image, once loaded
@@ -48,11 +77,13 @@ void HeightMap::initScene(){
 	mesh->normals = new vector<vec3>();
 	mesh->index = new vector<unsigned int>();
 
-	genMesh(bits);
-	genBuffers();
+	//genMesh(bits);
+	//genBuffers();
+	rawImage = bits;
 
 	//Free FreeImage's copy of the data
 	FreeImage_Unload(dib);
+
 }
 
 int mat2vecIndex(int r, int c, int nc){
@@ -63,7 +94,7 @@ int mat2vecIndex(int r, int c, int nc){
 */
 void HeightMap::genMesh(BYTE* bits){
 	float scaleFactorX = 1.0f / height;
-	float scaleFactorY =  1.0f / 255.0f;
+	float scaleFactorY = 1.0f / 255.0f;
 	float scaleFactorZ = 1.0f / width;
 	
 	// Length of one row in data
@@ -254,10 +285,9 @@ void HeightMap::genBuffers(){
 		20, 21, 22, 20, 22, 23
 	};
 
-	GLuint vaoHandle;
-	glGenVertexArrays(1, &vaoHandle);
-	glBindVertexArray(vaoHandle);
-	vaoID = vaoHandle;
+	glGenVertexArrays(1, &vaoID);
+	glBindVertexArray(vaoID);
+
 	unsigned int handle[4];
 	glGenBuffers(4, handle);
 
@@ -304,6 +334,16 @@ void HeightMap::genBuffers(){
 }
 
 void HeightMap::update(double deltaTime){
+	handleInput();
+	camera->Update(deltaTime);
+
+	view = camera->Look();
+	model = glm::translate(vec3(0.0f, 0.0f, 1.0f)); // push back
+	mvpMat = projection * view * model;
+	prog.setUniform("ModelViewMatrix", mvpMat);
+}
+
+void HeightMap::handleInput(){
 
 }
 void HeightMap::resize(int x, int y){
@@ -311,6 +351,7 @@ void HeightMap::resize(int x, int y){
 }
 
 void HeightMap::render(){
+	glClear(GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_TRIANGLES, mesh->index->size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 }

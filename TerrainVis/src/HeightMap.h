@@ -8,16 +8,14 @@
 
 #ifndef HMAP_H
 #define HMAP_H
-#include <GL/glew.h>
-#include <vector>
-#include <iostream>
-#include <windows.h>
-#include <gl/gl.h>
-#include <GLFW\glfw3.h>
+
+#include "gl_core_4_4.h"
+#include "glslprogram.h"
+#include "GLFW\glfw3.h"
 #include "FreeImage.h"
-#include "glm\glm.hpp"
-#include "glm\gtx\string_cast.hpp"
 #include "Scene.h"
+#include <vector>
+#include "Camera.h"
 
 using namespace std;
 using namespace glm;
@@ -56,12 +54,25 @@ public:
 private:
 	void genMesh(BYTE* imgData);
 	void genBuffers();
+	void loadImage();
+	void handleInput();
 
+	GLSLProgram prog;
+	BYTE* rawImage;
 	Mesh* mesh = NULL;
 	unsigned int height, width;
 	GLuint vboID, vaoID, iboID;
 	unsigned int ptr_inc;
 	const char* filename;
+	
+	Camera* camera;
+	GLFWwindow* window;
+
+
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
+	glm::mat4 mvpMat;
 };
 
 #endif
