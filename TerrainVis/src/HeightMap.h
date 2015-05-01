@@ -58,6 +58,7 @@ private:
 	void handleInput();
 
 	GLSLProgram prog;
+	GLSLProgram phongProg;
 	BYTE* rawImage;
 	Mesh* mesh = NULL;
 	unsigned int height, width;
@@ -67,6 +68,7 @@ private:
 	
 	Camera* camera;
 	GLFWwindow* window;
+	bool wireframe;
 
 
 	glm::mat4 model;

@@ -3,8 +3,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include "glutils.h"
-
+#include "VBOSphere.h"
 using namespace std;
+
+VBOSphere sphere;
+
+//add to glfwGetKey that gets the pressed key only once (not several times)
+char keyOnce[GLFW_KEY_LAST + 1];
+#define glfwGetKeyOnce(WINDOW, KEY)             \
+    (glfwGetKey(WINDOW, KEY) ?              \
+     (keyOnce[KEY] ? false : (keyOnce[KEY] = true)) :   \
+     (keyOnce[KEY] = false))
+
 
 HeightMap::HeightMap(GLFWwindow* window, const char* filename){
 	this->window = window;
@@ -17,15 +27,20 @@ HeightMap::HeightMap(GLFWwindow* window, const char* filename){
 void HeightMap::initScene(){
 	camera = new Camera(window);
 	loadImage();
-	genMesh(rawImage);
 	genBuffers();
+	sphere.initScene();
 
 	// load shaders
 	try {
 		prog.compileShader("shader/basic.vert");
 		prog.compileShader("shader/basic.frag");
+		//phongProg.compileShader("shader/phong.vert");
+		//phongProg.compileShader("shader/phong.frag");
 		prog.link();
 		prog.use();
+		//phongProg.link();
+		//phongProg.use();
+
 	}
 	catch (GLSLProgramException &e) {
 		cerr << e.what() << endl;
@@ -79,7 +94,8 @@ void HeightMap::loadImage(){
 
 	//genMesh(bits);
 	//genBuffers();
-	rawImage = bits;
+	//rawImage = bits;
+	genMesh(bits);
 
 	//Free FreeImage's copy of the data
 	FreeImage_Unload(dib);
@@ -173,7 +189,7 @@ void HeightMap::genMesh(BYTE* bits){
 	//	vert_t->push_back(t);
 	//}
 }
-
+//void gen(uint qual);
 void HeightMap::genBuffers(){
 	float side = 1.0f;
 	float side2 = side / 2.0f;
@@ -338,11 +354,16 @@ void HeightMap::genBuffers(){
 
 	//glBindVertexArray(0);
 
+	vector<vec3> colors;
+	for (int i = 0; i < mesh->vertices->size(); i++){
+		colors.push_back(vec3((float)i / mesh->vertices->size(), 0.2f, 0.4f));
+	}
+
 	glGenVertexArrays(1, &vaoID);
 	glBindVertexArray(vaoID);
 
-	unsigned int handle[3];
-	glGenBuffers(3, handle);
+	unsigned int handle[4];
+	glGenBuffers(4, handle);
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
 	glBufferData(GL_ARRAY_BUFFER, mesh->vertices->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->vertices)[0], GL_STATIC_DRAW);
@@ -350,11 +371,16 @@ void HeightMap::genBuffers(){
 	glEnableVertexAttribArray(0);  // Vertex position
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	glBufferData(GL_ARRAY_BUFFER, mesh->normals->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->normals)[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), (GLvoid*)&colors[0], GL_STATIC_DRAW);
 	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	glEnableVertexAttribArray(1);  // Vertex normal
+	glEnableVertexAttribArray(1);  // Vertex colors
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
+	glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
+	glBufferData(GL_ARRAY_BUFFER, mesh->normals->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->normals)[0], GL_STATIC_DRAW);
+	glVertexAttribPointer((GLuint)2, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(2);  // Vertex normal
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index->size() * sizeof(GLuint), (GLvoid*)&(*mesh->index)[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
@@ -363,97 +389,36 @@ void HeightMap::genBuffers(){
 void HeightMap::update(double deltaTime){
 	handleInput();
 	camera->Update(deltaTime);
-
 	view = camera->Look();
-	model = glm::translate(vec3(0.0f, 0.0f, 1.0f)); // push back
+	view *= glm::translate(vec3(0.0f, 0.0f, 3.0f));
+	//model = glm::translate(vec3(0.0f, 0.0f, 3.0f)); // push back
 	mvpMat = projection * view * model;
 	prog.setUniform("ModelViewMatrix", mvpMat);
 }
 
 void HeightMap::handleInput(){
+	
+	if (glfwGetKeyOnce(window, 'Q')){
+		wireframe = !wireframe;
+		if (wireframe){
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		else{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+	}
 
 }
 void HeightMap::resize(int x, int y){
 	
 }
-typedef struct
-{
-	GLfloat v[3]; //xyz
-	GLfloat n[3]; //xyz
-}vertex_t;
-vector<vertex_t> vertices;
-vector<int> indices;
-void gen(uint qual){
-	vertex_t v;
-
-	double tetaStep = (2 * glm::pi<float>()) / (double)qual;
-	double fiiStep = glm::pi<float>() / (double)qual;
-
-	int tetacount = 0;
-	int fiicount = 0;
-
-	/// Generates vetrice data
-	for (double teta = 0.0; teta <= (2 * glm::pi<float>()); teta += tetaStep)
-	{
-		tetacount++;
-		fiicount = 0;
-		for (double fii = 0.0; fii < glm::pi<float>(); fii += fiiStep)
-		{
-			v.v[0] = cos(teta) * sin(fii);
-			v.v[1] = sin(teta) * sin(fii);
-			v.v[2] = cos(fii);
-			v.n[0] = v.v[0];
-			v.n[1] = v.v[1];
-			v.n[2] = v.v[2];
-
-			vertices.push_back(v);
-			fiicount++;
-			if (fiicount >= qual)
-				break;
-		}
-		v.v[0] = cos(teta) * sin(glm::pi<float>());
-		v.v[1] = sin(teta) * sin(glm::pi<float>());
-		v.v[2] = cos(glm::pi<float>());
-		v.n[0] = v.v[0];
-		v.n[1] = v.v[1];
-		v.n[2] = v.v[2];
-
-		vertices.push_back(v);
-		if (tetacount > qual)
-			break;
-	}
-
-	/// Make indexes
-	int qualMaisUm = qual + 1;
-	for (int i = 0; i < qual - 1; i++)
-	{
-		for (int j = 0; j < qualMaisUm - 1; j++)
-		{
-			indices.push_back(i       * qualMaisUm + j);
-			indices.push_back((i + 1) * qualMaisUm + j + 1);
-			indices.push_back((i + 1) * qualMaisUm + j);
-
-			indices.push_back(i       * qualMaisUm + j);
-			indices.push_back(i       * qualMaisUm + j + 1);
-			indices.push_back((i + 1) * qualMaisUm + j + 1);
-		}
-	}
-	for (int i = 0; i < qual; i++)
-	{
-		indices.push_back((qual - 1)  * qualMaisUm + i);
-		indices.push_back(0 + i + 1);
-		indices.push_back(0 + i);
-
-		indices.push_back((qual - 1) * qualMaisUm + i);
-		indices.push_back((qual - 1) * qualMaisUm + i + 1);
-		indices.push_back(0 + i + 1);
-	}
-}
-
 void HeightMap::render(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_TRIANGLES, mesh->index->size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+	//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+	//glBindVertexArray(0);
+	//sphere.render();
 }
 

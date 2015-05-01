@@ -29,6 +29,7 @@
     <ClCompile Include="src\HeightMap.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\SceneBasic.cpp" />
+    <ClCompile Include="src\VBOSphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
@@ -38,10 +39,13 @@
     <ClInclude Include="src\HeightMap.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneBasic.h" />
+    <ClInclude Include="src\VBOSphere.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic.frag" />
     <None Include="shader\basic.vert" />
+    <None Include="shader\phong.frag" />
+    <None Include="shader\phong.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{699DD95F-8953-4BED-8201-44A17BFAD972}</ProjectGuid>

@@ -9,8 +9,9 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
-#include "HeightMap.h"
 #include <gl\glew.h>
+
+#include "HeightMap.h"
 
 using std::string;
 using namespace std;
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
 	GLUtils::dumpGLInfo();
 
 	//scene = new SceneBasic(window);
-	scene = new HeightMap(window, "resources/terrain.jpg");
+	scene = new HeightMap(window, "resources/terrain2.jpg");
 
 	// Initialization
 	initializeGL();

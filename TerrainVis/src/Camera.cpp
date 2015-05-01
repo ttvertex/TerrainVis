@@ -12,9 +12,9 @@ Camera::Camera(GLFWwindow* window)
 {
 	this->window = window;
 	vEye = glm::vec3(0.0f, 0.0f, 0.0f);
-	vView = glm::vec3(0.0f, 0.0, -1.0f);
+	vView = glm::vec3(0.0f, 0.0, 10.0f);
 	vUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	fSpeed = 5.0f;
+	fSpeed = 2.0f;
 	fSensitivity = 0.01f;
 	this->SetMovingKeys('W', 'S', 'A', 'D');
 }
