@@ -3,10 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include "glutils.h"
-#include "VBOSphere.h"
 using namespace std;
-
-VBOSphere sphere;
 
 //add to glfwGetKey that gets the pressed key only once (not several times)
 char keyOnce[GLFW_KEY_LAST + 1];
@@ -28,7 +25,6 @@ void HeightMap::initScene(){
 	camera = new Camera(window);
 	loadImage();
 	genBuffers();
-	sphere.initScene();
 
 	// load shaders
 	try {
@@ -92,9 +88,6 @@ void HeightMap::loadImage(){
 	mesh->normals = new vector<vec3>();
 	mesh->index = new vector<unsigned int>();
 
-	//genMesh(bits);
-	//genBuffers();
-	//rawImage = bits;
 	genMesh(bits);
 
 	//Free FreeImage's copy of the data
@@ -134,8 +127,8 @@ void HeightMap::genMesh(BYTE* bits){
 			//mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, 0.0f, -0.5f + fScaleR));
 		}
 	}
-	
-	// gen index - seems to be working
+	///////////////
+	// gen index 
 	for (int i = 0; i < height-1; i++){
 		for (int j = 0; j < width-1; j++){
 			int start = i * width + j;
@@ -149,18 +142,8 @@ void HeightMap::genMesh(BYTE* bits){
 			mesh->index->push_back(mat2vecIndex(i, j, width));
 		}
 	}
-
+	////////////////////
 	//normals
-	//for (int i = 0; i < mesh->index->size(); i+=3){
-	//	vec3 v1 = mesh->vertices->at(mesh->index->at(i));
-	//	vec3 v2 = mesh->vertices->at(mesh->index->at(i + 1));
-	//	vec3 v3 = mesh->vertices->at(mesh->index->at(i + 2));
-	//	
-	//	vec3 n1 = glm::normalize(cross(v1 - v2, v1 - v3));
-	//	mesh->normals->push_back(n1);
-	//}
-	//////
-
 	for (int i = 0; i < mesh->vertices->size(); i++){
 		mesh->normals->push_back(vec3());
 	}
@@ -179,184 +162,14 @@ void HeightMap::genMesh(BYTE* bits){
 	for (int i = 0; i < mesh->normals->size(); i++){ // normalization
 		mesh->normals->at(i) = glm::normalize(mesh->normals->at(i));
 	}
-
-	////transform into vertex_t struct
-	//vert_t = new vector<vertex_t>();
-	//for (int i = 0; i < mesh->vertices->size(); i++){
-	//	vec3 v = mesh->vertices->at(i);
-	//	vec3 n = mesh->normals->at(i);
-	//	vertex_t t = { v, n };
-	//	vert_t->push_back(t);
-	//}
+	////
 }
-//void gen(uint qual);
+
 void HeightMap::genBuffers(){
-	float side = 1.0f;
-	float side2 = side / 2.0f;
-
-	float v[24 * 3] = {
-		// Front
-		-side2, -side2, side2,
-		side2, -side2, side2,
-		side2, side2, side2,
-		-side2, side2, side2,
-		// Right
-		side2, -side2, side2,
-		side2, -side2, -side2,
-		side2, side2, -side2,
-		side2, side2, side2,
-		// Back
-		-side2, -side2, -side2,
-		-side2, side2, -side2,
-		side2, side2, -side2,
-		side2, -side2, -side2,
-		// Left
-		-side2, -side2, side2,
-		-side2, side2, side2,
-		-side2, side2, -side2,
-		-side2, -side2, -side2,
-		// Bottom
-		-side2, -side2, side2,
-		-side2, -side2, -side2,
-		side2, -side2, -side2,
-		side2, -side2, side2,
-		// Top
-		-side2, side2, side2,
-		side2, side2, side2,
-		side2, side2, -side2,
-		-side2, side2, -side2
-	};
-
-	float n[24 * 3] = {
-		// Front
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		// Right
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		// Back
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, -1.0f,
-		// Left
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		// Bottom
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		// Top
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
-	float tex[24 * 2] = {
-		// Front
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		// Right
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		// Back
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		// Left
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		// Bottom
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
-		// Top
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f
-	};
-
-	GLuint el[] = {
-		0, 1, 2, 0, 2, 3,
-		4, 5, 6, 4, 6, 7,
-		8, 9, 10, 8, 10, 11,
-		12, 13, 14, 12, 14, 15,
-		16, 17, 18, 16, 18, 19,
-		20, 21, 22, 20, 22, 23
-	};
-
-	//glGenVertexArrays(1, &vaoID);
-	//glBindVertexArray(vaoID);
-
-	//unsigned int handle[4];
-	//glGenBuffers(4, handle);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), v, GL_STATIC_DRAW);
-	//glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	//glEnableVertexAttribArray(0);  // Vertex position
-
-	//glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), n, GL_STATIC_DRAW);
-	//glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	//glEnableVertexAttribArray(1);  // Vertex normal
-
-	//glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-	//glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
-	//glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	//glEnableVertexAttribArray(2);  // texture coords
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), el, GL_STATIC_DRAW);
-
-	//glBindVertexArray(0);
-
-	//glGenVertexArrays(1, &vaoID);
-	//glBindVertexArray(vaoID);
-
-	//unsigned int handle[4];
-	//glGenBuffers(3, handle);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), v, GL_STATIC_DRAW);
-	//glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	//glEnableVertexAttribArray(0);  // Vertex position
-
-	//glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	//glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float), n, GL_STATIC_DRAW);
-	//glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	//glEnableVertexAttribArray(1);  // Vertex normal
-
-	////glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-	////glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
-	////glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	////glEnableVertexAttribArray(2);  // texture coords
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), el, GL_STATIC_DRAW);
-
-	//glBindVertexArray(0);
-
+	//dummy colors
 	vector<vec3> colors;
 	for (int i = 0; i < mesh->vertices->size(); i++){
-		colors.push_back(vec3((float)i / mesh->vertices->size(), 0.2f, 0.4f));
+		colors.push_back(vec3(0.4f, (float)i / mesh->vertices->size(), 0.4f));
 	}
 
 	glGenVertexArrays(1, &vaoID);
@@ -416,9 +229,5 @@ void HeightMap::render(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_TRIANGLES, mesh->index->size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
-	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
-	//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
-	//glBindVertexArray(0);
-	//sphere.render();
 }
 

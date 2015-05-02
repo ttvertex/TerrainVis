@@ -9,7 +9,6 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
-#include <gl\glew.h>
 
 #include "HeightMap.h"
 
@@ -18,23 +17,6 @@ using namespace std;
 
 Scene *scene;
 GLFWwindow *window;
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	
-}
-
-void mouse_motion_callback(GLFWwindow* window, double x, double y){
-	
-}
-
-void mouseButtonCB(GLFWwindow* window, int btn, int action, int mods){
-	
-}
-
-void mouseScrollCB(GLFWwindow* window, double offx, double offy){
-	
-}
 
 void initializeGL() {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -85,10 +67,6 @@ int main(int argc, char *argv[])
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPos(window, 0, 0);
 	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetCursorPosCallback(window, GLFWcursorposfun(mouse_motion_callback));
-	glfwSetMouseButtonCallback(window, GLFWmousebuttonfun(mouseButtonCB));
-	glfwSetScrollCallback(window, GLFWscrollfun(mouseScrollCB));
 	
 	// Load the OpenGL functions.
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED) {
