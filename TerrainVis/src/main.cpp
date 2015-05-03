@@ -21,6 +21,11 @@ GLFWwindow *window;
 void initializeGL() {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	scene->initScene();
+
+	glDebugMessageCallback(GLUtils::debugCallback, NULL);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+		GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
 }
 
 void mainLoop() {
@@ -73,7 +78,7 @@ int main(int argc, char *argv[])
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-
+	
 	GLUtils::dumpGLInfo();
 
 	//scene = new SceneBasic(window);

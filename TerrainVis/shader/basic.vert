@@ -6,6 +6,7 @@ layout (location=1) in vec3 VertexColor;
 out vec3 Color;
 
 uniform mat4 ModelViewMatrix;
+uniform vec3 g_LightPos;
 
 void main()
 {

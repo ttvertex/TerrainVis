@@ -43,6 +43,8 @@ public:
 	free the mesh
 	*/
 	bool unload();
+
+	void smooth(int k, int steps, BYTE* imageData);
 private:
 	void genMesh(BYTE* imgData);
 	void genBuffers();

@@ -5,6 +5,8 @@
 #include "glutils.h"
 using namespace std;
 
+vec3 lightPos = vec3();
+
 //add to glfwGetKey that gets the pressed key only once (not several times)
 char keyOnce[GLFW_KEY_LAST + 1];
 #define glfwGetKeyOnce(WINDOW, KEY)             \
@@ -25,23 +27,30 @@ void HeightMap::initScene(){
 	camera = new Camera(window);
 	loadImage();
 	genBuffers();
-
+	lightPos = vec3(3.0f, 3.0f, 3.0f);
 	// load shaders
 	try {
-		prog.compileShader("shader/basic.vert");
-		prog.compileShader("shader/basic.frag");
+		//prog.compileShader("shader/basic.vert");
+		//prog.compileShader("shader/basic.frag");
 		//phongProg.compileShader("shader/phong.vert");
 		//phongProg.compileShader("shader/phong.frag");
-		prog.link();
-		prog.use();
+		//prog.link();
+		//prog.use();
 		//phongProg.link();
 		//phongProg.use();
+		prog.compileShader("shader/directional.vs", GLSLShader::VERTEX);
+		prog.compileShader("shader/directional.fs", GLSLShader::FRAGMENT);
+		prog.link();
+		prog.use();
 
 	}
 	catch (GLSLProgramException &e) {
 		cerr << e.what() << endl;
 		exit(EXIT_FAILURE);
 	}
+	prog.setUniform("LightPosition", view * vec4(3.0f, 3.0f, 3.0f, 0.0f));
+	prog.setUniform("LightIntensity", vec3(1.0f, 1.0f, 1.0f));
+
 	prog.printActiveAttribs();
 }
 
@@ -169,7 +178,8 @@ void HeightMap::genBuffers(){
 	//dummy colors
 	vector<vec3> colors;
 	for (int i = 0; i < mesh->vertices->size(); i++){
-		colors.push_back(vec3(0.4f, (float)i / mesh->vertices->size(), 0.4f));
+		//colors.push_back(vec3(0.4f, (float)i / mesh->vertices->size(), 0.4f));
+		colors.push_back(vec3(0.647059f, 0.164706f, 0.164706f));//brown
 	}
 
 	glGenVertexArrays(1, &vaoID);
@@ -198,6 +208,46 @@ void HeightMap::genBuffers(){
 
 	glBindVertexArray(0);
 }
+/*
+	Smooth. NOT WORKING YET. MUST INCREMENT WITH row_step & ptr_inc
+*/
+void HeightMap::smooth(int k, int steps, BYTE* imageData){
+	for (int i = 0; i < steps; i++){
+		/* Rows, left to right */
+		for (int x = 1; x < height; x++){
+			for (int z = 0; z < width; z++){
+				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x - 1, z, width)]
+					* (1 - k) 
+					+ imageData[mat2vecIndex(x, z, width)] * k;
+			}
+		}
+		/* Rows, right to left*/
+		for (int x = height - 2; x > -1; x--){
+			for (int z = 1; z < width; z++){
+				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x + 1, z, width)]
+					* (1 - k)
+					+ imageData[mat2vecIndex(x, z, width)] * k;
+			}
+		}
+		/* Columns, bottom to top */
+		for (int x = 0; x < height; x++){
+			for (int z = 1; z < width; z++){
+				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x, z - 1, width)]
+					* (1 - k)
+					+ imageData[mat2vecIndex(x, z, width)] * k;
+			}
+		}
+
+		/* Columns, top to bottom */
+		for (int x = 0; x < height; x++){
+			for (int z = width - 2; z > -1; z--){
+				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x, z + 1, width)]
+					* (1 - k)
+					+ imageData[mat2vecIndex(x, z, width)] * k;
+			}
+		}
+	}
+}
 
 void HeightMap::update(double deltaTime){
 	handleInput();
@@ -205,8 +255,21 @@ void HeightMap::update(double deltaTime){
 	view = camera->Look();
 	view *= glm::translate(vec3(0.0f, 0.0f, 3.0f));
 	//model = glm::translate(vec3(0.0f, 0.0f, 3.0f)); // push back
-	mvpMat = projection * view * model;
+	mvpMat = view * model;
+	//prog.setUniform("ModelViewMatrix", mvpMat);
+
+	prog.setUniform("Kd", 0.8f, 0.8f, 0.8f); // Diffuse reflectivity
+	prog.setUniform("Ks", 0.9f, 0.9f, 0.9f); // Ambient reflectivity
+	prog.setUniform("Ka", 0.0f, 0.0f, 0.1f); // Specular reflectivity
+	prog.setUniform("Shininess", 180.0f);    // Specular shininess factor
 	prog.setUniform("ModelViewMatrix", mvpMat);
+	prog.setUniform("ProjectionMatrix", projection);
+	prog.setUniform("MVP", projection * mvpMat);
+	//prog.setUniform("NormalMatrix", mat3(glm::transpose(glm::inverse(projection*mvpMat))));
+	prog.setUniform("NormalMatrix", mat3(mvpMat));
+	prog.setUniform("LightPosition",  vec4(0.0f, 1.0f, 0.0f, 0.0f));
+	prog.setUniform("LightIntensity", vec3(0.8f, 0.8f, 0.0f));
+	
 }
 
 void HeightMap::handleInput(){
@@ -226,8 +289,10 @@ void HeightMap::resize(int x, int y){
 	
 }
 void HeightMap::render(){
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glBindVertexArray(vaoID);
 	glDrawElements(GL_TRIANGLES, mesh->index->size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
 }
 
