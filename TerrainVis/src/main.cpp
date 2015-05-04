@@ -87,7 +87,8 @@ int main(int argc, char *argv[])
 	// Initialization
 	initializeGL();
 
-	glEnable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT_AND_BACK);
 
 	// Enter the main loop

@@ -30,28 +30,17 @@ void HeightMap::initScene(){
 	lightPos = vec3(3.0f, 3.0f, 3.0f);
 	// load shaders
 	try {
-		//prog.compileShader("shader/basic.vert");
-		//prog.compileShader("shader/basic.frag");
-		//phongProg.compileShader("shader/phong.vert");
-		//phongProg.compileShader("shader/phong.frag");
-		//prog.link();
-		//prog.use();
-		//phongProg.link();
-		//phongProg.use();
-		prog.compileShader("shader/directional.vs", GLSLShader::VERTEX);
-		prog.compileShader("shader/directional.fs", GLSLShader::FRAGMENT);
-		prog.link();
-		prog.use();
+		phongProg.compileShader("shader/phong.vert");
+		phongProg.compileShader("shader/phong.frag");
+		phongProg.link();
+		phongProg.use();
 
 	}
 	catch (GLSLProgramException &e) {
 		cerr << e.what() << endl;
 		exit(EXIT_FAILURE);
 	}
-	prog.setUniform("LightPosition", view * vec4(3.0f, 3.0f, 3.0f, 0.0f));
-	prog.setUniform("LightIntensity", vec3(1.0f, 1.0f, 1.0f));
-
-	prog.printActiveAttribs();
+	phongProg.printActiveAttribs();
 }
 
 void HeightMap::loadImage(){
@@ -156,17 +145,18 @@ void HeightMap::genMesh(BYTE* bits){
 	for (int i = 0; i < mesh->vertices->size(); i++){
 		mesh->normals->push_back(vec3());
 	}
-	
-	for (int i = 0; i < mesh->index->size(); i+=3){
-		int index[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2)};
-		vec3 v1 = mesh->vertices->at(index[0]);
-		vec3 v2 = mesh->vertices->at(index[1]);
-		vec3 v3 = mesh->vertices->at(index[2]);
+	for (int k = 0; k < 10; k++){ // smooth normals
+		for (int i = 0; i < mesh->index->size(); i += 3){
+			int index[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2) };
+			vec3 v1 = mesh->vertices->at(index[0]);
+			vec3 v2 = mesh->vertices->at(index[1]);
+			vec3 v3 = mesh->vertices->at(index[2]);
 
-		vec3 n = glm::cross(v1 - v2, v1 - v3);
-		mesh->normals->at(index[0]) += n;
-		mesh->normals->at(index[1]) += n;
-		mesh->normals->at(index[2]) += n;
+			vec3 n = glm::cross(v1 - v2, v1 - v3);
+			mesh->normals->at(index[0]) += n;
+			mesh->normals->at(index[1]) += n;
+			mesh->normals->at(index[2]) += n;
+		}
 	}
 	for (int i = 0; i < mesh->normals->size(); i++){ // normalization
 		mesh->normals->at(i) = glm::normalize(mesh->normals->at(i));
@@ -179,7 +169,8 @@ void HeightMap::genBuffers(){
 	vector<vec3> colors;
 	for (int i = 0; i < mesh->vertices->size(); i++){
 		//colors.push_back(vec3(0.4f, (float)i / mesh->vertices->size(), 0.4f));
-		colors.push_back(vec3(0.647059f, 0.164706f, 0.164706f));//brown
+		//colors.push_back(vec3(0.647059f, 0.164706f, 0.164706f));//brown
+		colors.push_back(vec3(1.0f, 0.0f,0.0f));//brown
 	}
 
 	glGenVertexArrays(1, &vaoID);
@@ -254,22 +245,23 @@ void HeightMap::update(double deltaTime){
 	camera->Update(deltaTime);
 	view = camera->Look();
 	view *= glm::translate(vec3(0.0f, 0.0f, 3.0f));
-	//model = glm::translate(vec3(0.0f, 0.0f, 3.0f)); // push back
-	mvpMat = view * model;
-	//prog.setUniform("ModelViewMatrix", mvpMat);
-
-	prog.setUniform("Kd", 0.8f, 0.8f, 0.8f); // Diffuse reflectivity
-	prog.setUniform("Ks", 0.9f, 0.9f, 0.9f); // Ambient reflectivity
-	prog.setUniform("Ka", 0.0f, 0.0f, 0.1f); // Specular reflectivity
-	prog.setUniform("Shininess", 180.0f);    // Specular shininess factor
-	prog.setUniform("ModelViewMatrix", mvpMat);
-	prog.setUniform("ProjectionMatrix", projection);
-	prog.setUniform("MVP", projection * mvpMat);
-	//prog.setUniform("NormalMatrix", mat3(glm::transpose(glm::inverse(projection*mvpMat))));
-	prog.setUniform("NormalMatrix", mat3(mvpMat));
-	prog.setUniform("LightPosition",  vec4(0.0f, 1.0f, 0.0f, 0.0f));
-	prog.setUniform("LightIntensity", vec3(0.8f, 0.8f, 0.0f));
+	glm::mat4 mv = view * model;
 	
+	vec4 worldLight = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	// matrices
+	phongProg.setUniform("ModelViewMatrix", mv);
+	phongProg.setUniform("MVP", projection * mv); //ModelViewProjection
+	phongProg.setUniform("NormalMatrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]))); // Normal Matrix
+	// light info
+	phongProg.setUniform("Light.Ld", 1.0f, 1.0f, 1.0f); // Diffuse light intensity
+	phongProg.setUniform("Light.Position", view * worldLight); // Light position in eye coords.
+	phongProg.setUniform("Light.La", 0.4f, 0.4f, 0.4f);  // Ambient light intensity
+	phongProg.setUniform("Light.Ls", 1.0f, 1.0f, 1.0f); // Specular light intensity
+	// material info
+	phongProg.setUniform("Material.Ka", 0.9f, 0.5f, 0.3f); // Ambient reflectivity
+	phongProg.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f); // Diffuse reflectivity
+	phongProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f); // Specular reflectivity
+	phongProg.setUniform("Material.Shininess", 100.0f); // Specular shininess factor
 }
 
 void HeightMap::handleInput(){

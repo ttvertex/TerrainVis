@@ -44,8 +44,6 @@
   <ItemGroup>
     <None Include="shader\basic.frag" />
     <None Include="shader\basic.vert" />
-    <None Include="shader\directional.fs" />
-    <None Include="shader\directional.vs" />
     <None Include="shader\phong.frag" />
     <None Include="shader\phong.vert" />
   </ItemGroup>
