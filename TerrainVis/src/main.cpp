@@ -32,7 +32,8 @@ void mainLoop() {
 	double thisTime;
 	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-		
+		GLUtils::checkForOpenGLError(__FILE__, __LINE__);
+
 		thisTime = glfwGetTime();
 		scene->update(thisTime - lastTime);
 		lastTime = thisTime;
@@ -86,10 +87,6 @@ int main(int argc, char *argv[])
 
 	// Initialization
 	initializeGL();
-
-	//glDisable(GL_CULL_FACE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT_AND_BACK);
 
 	// Enter the main loop
 	mainLoop();

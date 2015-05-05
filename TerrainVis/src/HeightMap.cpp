@@ -40,7 +40,12 @@ void HeightMap::initScene(){
 		cerr << e.what() << endl;
 		exit(EXIT_FAILURE);
 	}
+
 	phongProg.printActiveAttribs();
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+
 }
 
 void HeightMap::loadImage(){
@@ -247,21 +252,20 @@ void HeightMap::update(double deltaTime){
 	view *= glm::translate(vec3(0.0f, 0.0f, 3.0f));
 	glm::mat4 mv = view * model;
 	
-	vec4 worldLight = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	// matrices
 	phongProg.setUniform("ModelViewMatrix", mv);
 	phongProg.setUniform("MVP", projection * mv); //ModelViewProjection
 	phongProg.setUniform("NormalMatrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]))); // Normal Matrix
 	// light info
 	phongProg.setUniform("Light.Ld", 1.0f, 1.0f, 1.0f); // Diffuse light intensity
-	phongProg.setUniform("Light.Position", view * worldLight); // Light position in eye coords.
+	phongProg.setUniform("Light.Position", view * vec4(lightPos, 1.0f)); // Light position in eye coords.
 	phongProg.setUniform("Light.La", 0.4f, 0.4f, 0.4f);  // Ambient light intensity
-	phongProg.setUniform("Light.Ls", 1.0f, 1.0f, 1.0f); // Specular light intensity
+	phongProg.setUniform("Light.Ls", 1.0f, 1.0f, 1.0f);  // Specular light intensity
 	// material info
 	phongProg.setUniform("Material.Ka", 0.9f, 0.5f, 0.3f); // Ambient reflectivity
 	phongProg.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f); // Diffuse reflectivity
 	phongProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f); // Specular reflectivity
-	phongProg.setUniform("Material.Shininess", 100.0f); // Specular shininess factor
+	phongProg.setUniform("Material.Shininess", 100.0f);    // Specular shininess factor
 }
 
 void HeightMap::handleInput(){
