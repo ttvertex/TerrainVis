@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
 	
 	GLUtils::dumpGLInfo();
 
-	//scene = new SceneBasic(window);
-	scene = new HeightMap(window, "resources/terrain2.jpg");
+	scene = new SceneBasic(window);
+	//scene = new HeightMap(window, "resources/terrain5.png");
 
 	// Initialization
 	initializeGL();

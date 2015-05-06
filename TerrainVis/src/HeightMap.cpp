@@ -125,7 +125,7 @@ void HeightMap::genMesh(BYTE* bits){
 			//mesh->vertices->push_back(v);
 			float fScaleC = float(j) / float(width - 1);
 			float fScaleR = float(i) / float(height - 1);
-			float fVertexHeight = float(*(bits + row_step * i + j * ptr_inc)) / 255.0f;
+			float fVertexHeight = float(*(bits + row_step * i + j * ptr_inc)) / 1000.0f;
 			mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR));
 			//mesh->vertices->push_back(glm::vec3(-0.5f + fScaleC, 0.0f, -0.5f + fScaleR));
 		}

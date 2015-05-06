@@ -37,8 +37,20 @@ SceneBasic::SceneBasic(GLFWwindow* window) {
 	mvpMat = glm::mat4(1.0f);
 }
 
+glm::vec3 interpolate(glm::vec3 p0, glm::vec3 p1, float height){
+	glm::vec3 res;
+	res.y = height;
+	res.x = p0.x + ((p1.x - p0.y) / (p1.z - p0.z)) * (height - p0.z);
+	res.y = p0.y + ((p1.y - p0.y) / (p1.z - p0.z)) * (height - p0.z);
+
+	cout << glm::to_string(res) << endl;
+	return res;
+}
+
 void SceneBasic::initScene()
 {
+	//interpolate(vec3(0.0f))
+
 #ifdef _DEBUG
 	glDebugMessageCallback(GLUtils::debugCallback, NULL);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
