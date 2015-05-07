@@ -44,7 +44,7 @@ public:
 	*/
 	bool unload();
 
-	void smooth(int k, int steps, BYTE* imageData);
+	void genLevelCurve();
 private:
 	void genMesh(BYTE* imgData);
 	void genBuffers();

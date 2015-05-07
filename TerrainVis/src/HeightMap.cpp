@@ -2,7 +2,9 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include "glutils.h"
+
 using namespace std;
 
 vec3 lightPos = vec3();
@@ -167,6 +169,48 @@ void HeightMap::genMesh(BYTE* bits){
 		mesh->normals->at(i) = glm::normalize(mesh->normals->at(i));
 	}
 	////
+
+	genLevelCurve();
+}
+
+glm::vec3 interpolate(glm::vec3 p0, glm::vec3 p1, float height){
+	glm::vec3 res;
+	res.y = height;
+	res.x = p0.x + ((p1.x - p0.x) / (p1.y - p0.y)) * (height - p0.y);
+	res.z = p0.z + ((p1.z - p0.z) / (p1.y - p0.y)) * (height - p0.y);
+
+	cout << glm::to_string(res) << endl;
+	return res;
+}
+
+void HeightMap::genLevelCurve(){
+	///triangle-plane intersection
+	///we are working on planes with form y=h where h is the height
+	float h = 0.5f;
+	vector<glm::vec3> interceptions;
+
+	for (int i = 0; i < mesh->index->size(); i += 3){
+	//for (int i = 0; i < 10; i += 3){
+		int index[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2) };
+		vec3 v1 = mesh->vertices->at(index[0]);
+		vec3 v2 = mesh->vertices->at(index[1]);
+		vec3 v3 = mesh->vertices->at(index[2]);
+
+		//   V1
+		//V2     V3
+		//cout << glm::to_string(v1) << endl;
+		//cout << glm::to_string(v2) << endl;
+		//cout << glm::to_string(v3) << endl;
+		if (v1.y < h && v2.y > h){ // intersect v1->v2
+			interpolate(v1, v2, h);
+		}
+		if (v1.y < h && v3.y < h){ // intersect v1->v3
+
+		}
+		if (v2.y < h && v3.y < h){ // intersect v2->v3
+
+		}
+	}
 }
 
 void HeightMap::genBuffers(){
@@ -204,46 +248,7 @@ void HeightMap::genBuffers(){
 
 	glBindVertexArray(0);
 }
-/*
-	Smooth. NOT WORKING YET. MUST INCREMENT WITH row_step & ptr_inc
-*/
-void HeightMap::smooth(int k, int steps, BYTE* imageData){
-	for (int i = 0; i < steps; i++){
-		/* Rows, left to right */
-		for (int x = 1; x < height; x++){
-			for (int z = 0; z < width; z++){
-				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x - 1, z, width)]
-					* (1 - k) 
-					+ imageData[mat2vecIndex(x, z, width)] * k;
-			}
-		}
-		/* Rows, right to left*/
-		for (int x = height - 2; x > -1; x--){
-			for (int z = 1; z < width; z++){
-				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x + 1, z, width)]
-					* (1 - k)
-					+ imageData[mat2vecIndex(x, z, width)] * k;
-			}
-		}
-		/* Columns, bottom to top */
-		for (int x = 0; x < height; x++){
-			for (int z = 1; z < width; z++){
-				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x, z - 1, width)]
-					* (1 - k)
-					+ imageData[mat2vecIndex(x, z, width)] * k;
-			}
-		}
 
-		/* Columns, top to bottom */
-		for (int x = 0; x < height; x++){
-			for (int z = width - 2; z > -1; z--){
-				imageData[mat2vecIndex(x, z, width)] = imageData[mat2vecIndex(x, z + 1, width)]
-					* (1 - k)
-					+ imageData[mat2vecIndex(x, z, width)] * k;
-			}
-		}
-	}
-}
 
 void HeightMap::update(double deltaTime){
 	handleInput();
