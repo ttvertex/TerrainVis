@@ -25,7 +25,9 @@ vec3 phongModel( vec3 pos, vec3 norm )
     vec3 s = normalize(vec3(Light.Position) - pos);
     vec3 v = normalize(-pos.xyz);
     vec3 r = reflect( -s, norm );
-    vec3 ambient = Light.Intensity * Material.Ka;
+    vec3 ambient;
+	ambient = (GCurveLevel == 0 ) ? Light.Intensity * vec3(0.1,0.4,0.8) : Light.Intensity * vec3(0.1,0.8,0.1);
+	//ambient = (GCurveLevel == 0 ) ? Light.Intensity * Material.Ka :  vec3(0.1,0.8,0.1);
     float sDotN = max( dot(s,norm), 0.0 );
     vec3 diffuse = Light.Intensity * Material.Kd * sDotN;
     vec3 spec = vec3(0.0);
@@ -40,11 +42,11 @@ void main() {
 
     vec4 color;
 	if(GCurveLevel == 0){
-		color = vec4(0.1,0.4,0.8,1.0);
-		//color = vec4( phongModel(GPosition, GNormal), 1.0 );
+		//color = vec4(0.1,0.4,0.8,1.0);
+		color = vec4( phongModel(GPosition, GNormal), 1.0 );
 	}else{
-		color = vec4(0.8,0.4,0.8,1.0);
-		//color = vec4( phongModel(GPosition, GNormal), 1.0 );
+		//color = vec4(0.1,0.8,0.1,1.0);		
+		color = vec4( phongModel(GPosition, GNormal), 1.0 );
 	}
 	
     FragColor = color;
