@@ -52,7 +52,7 @@ private:
 	void handleInput();
 
 	GLSLProgram prog;
-	GLSLProgram phongProg;
+	GLSLProgram shaderProg;
 	BYTE* rawImage;
 	Mesh* mesh = NULL;
 	unsigned int height, width;

@@ -32,16 +32,19 @@
     <ClInclude Include="src\VBOSphere.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shader\levelCurve.gs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\levelCurve.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\levelCurve.vert">
+      <Filter>shaders</Filter>
+    </None>
     <None Include="shader\basic.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shader\basic.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\phong.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\phong.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

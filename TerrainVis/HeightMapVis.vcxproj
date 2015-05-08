@@ -44,8 +44,9 @@
   <ItemGroup>
     <None Include="shader\basic.frag" />
     <None Include="shader\basic.vert" />
-    <None Include="shader\phong.frag" />
-    <None Include="shader\phong.vert" />
+    <None Include="shader\levelCurve.gs" />
+    <None Include="shader\levelCurve.frag" />
+    <None Include="shader\levelCurve.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{699DD95F-8953-4BED-8201-44A17BFAD972}</ProjectGuid>

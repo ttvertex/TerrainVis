@@ -32,10 +32,11 @@ void HeightMap::initScene(){
 	lightPos = vec3(3.0f, 3.0f, 3.0f);
 	// load shaders
 	try {
-		phongProg.compileShader("shader/phong.vert");
-		phongProg.compileShader("shader/phong.frag");
-		phongProg.link();
-		phongProg.use();
+		shaderProg.compileShader("shader/levelCurve.vert");
+		shaderProg.compileShader("shader/levelCurve.frag");
+		shaderProg.compileShader("shader/levelCurve.gs", GLSLShader::GLSLShaderType::GEOMETRY);
+		shaderProg.link();
+		shaderProg.use();
 
 	}
 	catch (GLSLProgramException &e) {
@@ -43,7 +44,7 @@ void HeightMap::initScene(){
 		exit(EXIT_FAILURE);
 	}
 
-	phongProg.printActiveAttribs();
+	shaderProg.printActiveAttribs();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
@@ -175,20 +176,35 @@ void HeightMap::genMesh(BYTE* bits){
 
 glm::vec3 interpolate(glm::vec3 p0, glm::vec3 p1, float height){
 	glm::vec3 res;
-	res.y = height;
-	res.x = p0.x + ((p1.x - p0.x) / (p1.y - p0.y)) * (height - p0.y);
-	res.z = p0.z + ((p1.z - p0.z) / (p1.y - p0.y)) * (height - p0.y);
+	float t;
+	//line equation:  p0 + t * p1
+	//plane equation: y = height
 
-	cout << glm::to_string(res) << endl;
+	//(x,y,z) = p0 + t * p1 
+	res = p0 + p1;
+	//from the plane equation y = height = aux.y * t
+	t = height / res.y;
+	//substitute back. If any of p1's coords is zero, then we don't multiply
+	if (p1.x){
+		res.x *= t;
+	}
+	if (p1.y){
+		res.y *= t;
+	}
+	if (p1.z){
+		res.z *= t;
+	}
+	//cout << "P=" << glm::to_string(res) << endl;
 	return res;
 }
 
+vector<glm::vec3> interceptions;
 void HeightMap::genLevelCurve(){
 	///triangle-plane intersection
 	///we are working on planes with form y=h where h is the height
-	float h = 0.5f;
+	float h = 0.1f;
 	vector<glm::vec3> interceptions;
-
+	interpolate(vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, -3.0f, -2.0f), -0.3f);
 	for (int i = 0; i < mesh->index->size(); i += 3){
 	//for (int i = 0; i < 10; i += 3){
 		int index[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2) };
@@ -201,32 +217,25 @@ void HeightMap::genLevelCurve(){
 		//cout << glm::to_string(v1) << endl;
 		//cout << glm::to_string(v2) << endl;
 		//cout << glm::to_string(v3) << endl;
-		if (v1.y < h && v2.y > h){ // intersect v1->v2
+		if ((v1.y <= h && v2.y >= h) || (v1.y >= h && v2.y <= h)){ // intersect v1->v2
 			interpolate(v1, v2, h);
 		}
-		if (v1.y < h && v3.y < h){ // intersect v1->v3
-
+		if ((v1.y <= h && v3.y >= h) || (v1.y >= h && v3.y <= h)){ // intersect v1->v3
+			interpolate(v1, v2, h);
 		}
-		if (v2.y < h && v3.y < h){ // intersect v2->v3
-
+		if ((v2.y <= h && v3.y >= h) || (v2.y >= h && v3.y <= h)){ // intersect v2->v3
+			interpolate(v1, v2, h);
 		}
 	}
 }
 
 void HeightMap::genBuffers(){
-	//dummy colors
-	vector<vec3> colors;
-	for (int i = 0; i < mesh->vertices->size(); i++){
-		//colors.push_back(vec3(0.4f, (float)i / mesh->vertices->size(), 0.4f));
-		//colors.push_back(vec3(0.647059f, 0.164706f, 0.164706f));//brown
-		colors.push_back(vec3(1.0f, 0.0f,0.0f));//brown
-	}
 
 	glGenVertexArrays(1, &vaoID);
 	glBindVertexArray(vaoID);
 
-	unsigned int handle[4];
-	glGenBuffers(4, handle);
+	unsigned int handle[3];
+	glGenBuffers(3, handle);
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
 	glBufferData(GL_ARRAY_BUFFER, mesh->vertices->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->vertices)[0], GL_STATIC_DRAW);
@@ -234,16 +243,11 @@ void HeightMap::genBuffers(){
 	glEnableVertexAttribArray(0);  // Vertex position
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), (GLvoid*)&colors[0], GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	glEnableVertexAttribArray(1);  // Vertex colors
-
-	glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
 	glBufferData(GL_ARRAY_BUFFER, mesh->normals->size() * sizeof(glm::vec3), (GLvoid*)&(*mesh->normals)[0], GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)2, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
-	glEnableVertexAttribArray(2);  // Vertex normal
+	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)));
+	glEnableVertexAttribArray(1);  // Vertex normal
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[2]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index->size() * sizeof(GLuint), (GLvoid*)&(*mesh->index)[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
@@ -258,19 +262,17 @@ void HeightMap::update(double deltaTime){
 	glm::mat4 mv = view * model;
 	
 	// matrices
-	phongProg.setUniform("ModelViewMatrix", mv);
-	phongProg.setUniform("MVP", projection * mv); //ModelViewProjection
-	phongProg.setUniform("NormalMatrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]))); // Normal Matrix
+	shaderProg.setUniform("ModelViewMatrix", mv);
+	shaderProg.setUniform("MVP", projection * mv); //ModelViewProjection
+	shaderProg.setUniform("NormalMatrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]))); // Normal Matrix
 	// light info
-	phongProg.setUniform("Light.Ld", 1.0f, 1.0f, 1.0f); // Diffuse light intensity
-	phongProg.setUniform("Light.Position", view * vec4(lightPos, 1.0f)); // Light position in eye coords.
-	phongProg.setUniform("Light.La", 0.4f, 0.4f, 0.4f);  // Ambient light intensity
-	phongProg.setUniform("Light.Ls", 1.0f, 1.0f, 1.0f);  // Specular light intensity
+	shaderProg.setUniform("Light.Position", view * vec4(lightPos, 1.0f)); // Light position in eye coords.
+	shaderProg.setUniform("Light.Intensity", 1.0f, 1.0f, 1.0f);
 	// material info
-	phongProg.setUniform("Material.Ka", 0.9f, 0.5f, 0.3f); // Ambient reflectivity
-	phongProg.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f); // Diffuse reflectivity
-	phongProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f); // Specular reflectivity
-	phongProg.setUniform("Material.Shininess", 100.0f);    // Specular shininess factor
+	shaderProg.setUniform("Material.Ka", 0.9f, 0.5f, 0.3f); // Ambient reflectivity
+	shaderProg.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f); // Diffuse reflectivity
+	shaderProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f); // Specular reflectivity
+	shaderProg.setUniform("Material.Shininess", 100.0f);    // Specular shininess factor
 }
 
 void HeightMap::handleInput(){
