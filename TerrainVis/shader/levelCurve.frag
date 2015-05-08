@@ -16,6 +16,7 @@ uniform MaterialInfo Material;
 
 in vec3 GPosition;
 in vec3 GNormal;
+flat in int  GCurveLevel;
 
 layout( location = 0 ) out vec4 FragColor;
 
@@ -37,7 +38,14 @@ vec3 phongModel( vec3 pos, vec3 norm )
 
 void main() {
 
-    vec4 color = vec4( phongModel(GPosition, GNormal), 1.0 );
-
+    vec4 color;
+	if(GCurveLevel == 0){
+		color = vec4(0.1,0.4,0.8,1.0);
+		//color = vec4( phongModel(GPosition, GNormal), 1.0 );
+	}else{
+		color = vec4(0.8,0.4,0.8,1.0);
+		//color = vec4( phongModel(GPosition, GNormal), 1.0 );
+	}
+	
     FragColor = color;
 }
