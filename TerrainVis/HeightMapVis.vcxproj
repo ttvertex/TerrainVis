@@ -44,7 +44,7 @@
   <ItemGroup>
     <None Include="shader\basic.frag" />
     <None Include="shader\basic.vert" />
-    <None Include="shader\levelCurve.gs" />
+    <None Include="shader\levelCurve.geom" />
     <None Include="shader\levelCurve.frag" />
     <None Include="shader\levelCurve.vert" />
   </ItemGroup>

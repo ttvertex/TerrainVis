@@ -34,7 +34,7 @@ void HeightMap::initScene(){
 	try {
 		shaderProg.compileShader("shader/levelCurve.vert");
 		shaderProg.compileShader("shader/levelCurve.frag");
-		shaderProg.compileShader("shader/levelCurve.gs", GLSLShader::GLSLShaderType::GEOMETRY);
+		shaderProg.compileShader("shader/levelCurve.geom", GLSLShader::GLSLShaderType::GEOMETRY);
 		shaderProg.link();
 		shaderProg.use();
 
