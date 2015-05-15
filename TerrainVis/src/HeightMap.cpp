@@ -175,27 +175,15 @@ void HeightMap::genMesh(BYTE* bits){
 }
 
 glm::vec3 interpolate(glm::vec3 p0, glm::vec3 p1, float height){
-	glm::vec3 res;
-	float t;
-	//line equation:  p0 + t * p1
-	//plane equation: y = height
-
-	//(x,y,z) = p0 + t * p1 
-	res = p0 + p1;
-	//from the plane equation y = height = aux.y * t
-	t = height / res.y;
-	//substitute back. If any of p1's coords is zero, then we don't multiply
-	if (p1.x){
-		res.x *= t;
-	}
-	if (p1.y){
-		res.y *= t;
-	}
-	if (p1.z){
-		res.z *= t;
-	}
-	//cout << "P=" << glm::to_string(res) << endl;
-	return res;
+		glm::vec3 res;
+		float t;
+		//line equation:  p0 + t * (p1 - p0)
+		//plane equation: y = height
+		//(x,y,z) = p0 + t * (p1 - p0)
+		t = (height - p0.y) / (p1.y - p0.y);
+		res = p0 + t * (p1 - p0);
+		//cout << "P=" << glm::to_string(res) << endl;
+		return res;
 }
 
 vector<glm::vec3> interceptions;
@@ -204,7 +192,7 @@ void HeightMap::genLevelCurve(){
 	///we are working on planes with form y=h where h is the height
 	float h = 0.1f;
 	vector<glm::vec3> interceptions;
-	interpolate(vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, -3.0f, -2.0f), -0.3f);
+	interpolate(vec3(1.0f, 1.0f, 0.0f), vec3(-3.0f, -3.0f, 0.0f), -1.5f);
 	for (int i = 0; i < mesh->index->size(); i += 3){
 	//for (int i = 0; i < 10; i += 3){
 		int index[] = { mesh->index->at(i), mesh->index->at(i + 1), mesh->index->at(i + 2) };
@@ -218,13 +206,13 @@ void HeightMap::genLevelCurve(){
 		//cout << glm::to_string(v2) << endl;
 		//cout << glm::to_string(v3) << endl;
 		if ((v1.y <= h && v2.y >= h) || (v1.y >= h && v2.y <= h)){ // intersect v1->v2
-			interpolate(v1, v2, h);
+			//interpolate(v1, v2, h);
 		}
 		if ((v1.y <= h && v3.y >= h) || (v1.y >= h && v3.y <= h)){ // intersect v1->v3
-			interpolate(v1, v2, h);
+			//interpolate(v1, v2, h);
 		}
 		if ((v2.y <= h && v3.y >= h) || (v2.y >= h && v3.y <= h)){ // intersect v2->v3
-			interpolate(v1, v2, h);
+			//interpolate(v1, v2, h);
 		}
 	}
 }
