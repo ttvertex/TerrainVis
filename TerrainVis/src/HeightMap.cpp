@@ -8,6 +8,7 @@
 using namespace std;
 
 vec3 lightPos = vec3();
+float g_LevelCurveHeight = 0.1f;
 
 //add to glfwGetKey that gets the pressed key only once (not several times)
 char keyOnce[GLFW_KEY_LAST + 1];
@@ -261,6 +262,8 @@ void HeightMap::update(double deltaTime){
 	shaderProg.setUniform("Material.Kd", 0.9f, 0.5f, 0.3f); // Diffuse reflectivity
 	shaderProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f); // Specular reflectivity
 	shaderProg.setUniform("Material.Shininess", 100.0f);    // Specular shininess factor
+
+	shaderProg.setUniform("LCurve.Height", g_LevelCurveHeight);    // height
 }
 
 void HeightMap::handleInput(){
@@ -273,8 +276,11 @@ void HeightMap::handleInput(){
 		else{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
+	}else if (glfwGetKeyOnce(window, GLFW_KEY_UP)){
+		g_LevelCurveHeight += 0.001f;
+	}else if (glfwGetKeyOnce(window, GLFW_KEY_DOWN)){
+		g_LevelCurveHeight -= 0.001f;
 	}
-
 }
 void HeightMap::resize(int x, int y){
 	
