@@ -14,9 +14,6 @@
     <Text Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Buffers">
-      <UniqueIdentifier>{08365aae-4353-4bd2-ae08-53eb524786cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{64ec7b40-9bc6-4815-b2a0-25fb5840a57f}</UniqueIdentifier>
     </Filter>
@@ -32,16 +29,19 @@
     <ClInclude Include="src\VBOSphere.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shader\levelCurve.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\levelCurve.vert">
+      <Filter>shaders</Filter>
+    </None>
     <None Include="shader\basic.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shader\basic.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\phong.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\phong.vert">
+    <None Include="shader\levelCurve.geom">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

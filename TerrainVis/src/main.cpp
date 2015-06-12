@@ -32,7 +32,8 @@ void mainLoop() {
 	double thisTime;
 	double lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-		
+		GLUtils::checkForOpenGLError(__FILE__, __LINE__);
+
 		thisTime = glfwGetTime();
 		scene->update(thisTime - lastTime);
 		lastTime = thisTime;
@@ -82,14 +83,10 @@ int main(int argc, char *argv[])
 	GLUtils::dumpGLInfo();
 
 	//scene = new SceneBasic(window);
-	scene = new HeightMap(window, "resources/terrain2.jpg");
+	scene = new HeightMap(window, "resources/terrain5.png");
 
 	// Initialization
 	initializeGL();
-
-	//glDisable(GL_CULL_FACE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT_AND_BACK);
 
 	// Enter the main loop
 	mainLoop();

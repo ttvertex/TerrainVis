@@ -1,3 +1,4 @@
+//USED IN SCENEBASIC.CPP
 #version 430
 
 layout (location=0) in vec3 VertexPosition;

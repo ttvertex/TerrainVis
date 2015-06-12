@@ -39,6 +39,7 @@ SceneBasic::SceneBasic(GLFWwindow* window) {
 
 void SceneBasic::initScene()
 {
+
 #ifdef _DEBUG
 	glDebugMessageCallback(GLUtils::debugCallback, NULL);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);

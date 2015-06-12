@@ -44,7 +44,7 @@ public:
 	*/
 	bool unload();
 
-	void smooth(int k, int steps, BYTE* imageData);
+	void genLevelCurve();
 private:
 	void genMesh(BYTE* imgData);
 	void genBuffers();
@@ -52,7 +52,7 @@ private:
 	void handleInput();
 
 	GLSLProgram prog;
-	GLSLProgram phongProg;
+	GLSLProgram shaderProg;
 	BYTE* rawImage;
 	Mesh* mesh = NULL;
 	unsigned int height, width;
