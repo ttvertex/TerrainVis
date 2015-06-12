@@ -14,9 +14,6 @@
     <Text Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Buffers">
-      <UniqueIdentifier>{08365aae-4353-4bd2-ae08-53eb524786cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{64ec7b40-9bc6-4815-b2a0-25fb5840a57f}</UniqueIdentifier>
     </Filter>
