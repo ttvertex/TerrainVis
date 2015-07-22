@@ -2,9 +2,7 @@
 
 //IO types
 layout (triangles) in;
-layout(triangle_strip, max_vertices = 9) out;
-//layout(line_strip, max_vertices = 6) out;
-//layout(points, max_vertices = 6) out;
+layout(triangle_strip, max_vertices = 3) out; // a triangle
 
 struct LevelCurve {
 	float Height; // height
@@ -68,8 +66,7 @@ void main(){
  //   EmitVertex();
  ////   ///////////////////////////
 
-    /////////// color interpolation along the edge
-
+    /////////// color interpolation along the edge. the vertex receives the color according to its distance to the level curve
 	vec4 v1 = vec4(WorldPosition[0], 1.0f);
     vec4 v2 = vec4(WorldPosition[1], 1.0f);
     vec4 v3 = vec4(WorldPosition[2], 1.0f);
@@ -83,8 +80,8 @@ void main(){
 	if(intersectPlaneLine(v1, v2, h)){
 		vec4 p = findPlaneLineIntersectionPoint(v1, v2, h);
 		double val = (length(p - v2) / v1v2d);
-		//GColor = mix(colorA, colorB, float(val));
-		GColor = vec4( 1.0f,0.1f,0.0f, 1.0f );
+		GColor = mix(colorA, colorB, clamp(float(val), 0.0f, 1.0f));
+		//GColor = vec4( 1.0f,0.1f,0.0f, 1.0f );
 	}else{
 		GColor = (WorldPosition[0].y < h) ?  colorA : colorB;
 	}
@@ -92,12 +89,13 @@ void main(){
     GPosition = VPosition[0];
     gl_Position = gl_in[0].gl_Position;
     EmitVertex();
+
     //p1
 	if(intersectPlaneLine(v1,v3,h)){
 		vec4 p = findPlaneLineIntersectionPoint(v1,v3,h);
 		double val = (length(p - v3) / v1v3d);
-		//GColor = mix(colorA, colorB,  float(val));
-		GColor = vec4( 1.0f,0.1f,0.0f, 1.0f );
+		GColor = mix(colorA, colorB,  clamp(float(val), 0.0f, 1.0f));
+		//GColor = vec4( 1.0f,0.1f,0.0f, 1.0f );
 	}else{
 		GColor = (WorldPosition[1].y < h) ?  colorA : colorB;
 	}
@@ -105,12 +103,13 @@ void main(){
     GPosition = VPosition[1];
     gl_Position = gl_in[1].gl_Position;
     EmitVertex();
+
     //p2
 	if(intersectPlaneLine(v2,v3,h)){
 		vec4 p = findPlaneLineIntersectionPoint(v2,v3,h);
 		double val = (length(p - v3) / v2v3d);
-		//GColor = mix(colorA, colorB, float(val));
-		GColor = vec4( 1.0f,0.1f,0.0f, 1.0f );
+		GColor = mix(colorA, colorB, clamp(float(val), 0.0f, 1.0f));
+		//GColor = vec4( 1.0f,0.1f,0.0f, 1.0f );
 	}else{
 		GColor = (WorldPosition[2].y < h) ?  colorA : colorB;
 	}
@@ -118,147 +117,6 @@ void main(){
     GPosition = VPosition[2];
     gl_Position = gl_in[2].gl_Position;
     EmitVertex();
- //   ///////////////////////////
-
- //////////////// DRAWING WITH LINES ---> NO FILL FACE
- 	//p0
-	//GNormal = VNormal[0];
- //   GPosition = VPosition[0];
-	//GColor = (WorldPosition[0].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
- //   gl_Position = gl_in[0].gl_Position;
- //   EmitVertex();
- //   //p1
-	//GNormal = VNormal[1];
- //   GPosition = VPosition[1];
-	//GColor = (WorldPosition[1].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
- //   gl_Position = gl_in[1].gl_Position;
- //   EmitVertex();
-    
-	////p1
-	//GNormal = VNormal[1];
- //   GPosition = VPosition[1];
-	//GColor = (WorldPosition[1].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
- //   gl_Position = gl_in[1].gl_Position;
- //   EmitVertex();
-	////p2
-	//GNormal = VNormal[2];
- //   GPosition = VPosition[2];
-	//GColor = (WorldPosition[2].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
- //   gl_Position = gl_in[2].gl_Position;
- //   EmitVertex();
-
-	////p2
-	//GNormal = VNormal[2];
- //   GPosition = VPosition[2];
-	//GColor = (WorldPosition[2].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
- //   gl_Position = gl_in[2].gl_Position;
- //   EmitVertex();
-	////p0
-	//GNormal = VNormal[0];
- //   GPosition = VPosition[0];
-	//GColor = (WorldPosition[0].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
- //   gl_Position = gl_in[0].gl_Position;
- //   EmitVertex();
-    ///////////////////////////
-
-	///////////// levelCurve triangle
-	//vec4 v1 = vec4(WorldPosition[0], 1.0f);
- //   vec4 v2 = vec4(WorldPosition[1], 1.0f);
- //   vec4 v3 = vec4(WorldPosition[2], 1.0f);
-    
-	//bool v1v2b, v1v3b, v2v3b;
- //   vec4 v1v2, v1v3, v2v3;
-	//v1v2b = v1v3b = v2v3b = false;
-
- //   if ((v1.y <= h && v2.y >= h) || (v1.y >= h && v2.y <= h)){ // intersect v1->v2
-	//	v1v2 = findPlaneLineIntersectionPoint(v1, v2, h);
-	//	//v1v2 = vec4((v1.x+v2.x)/2,(v1.y+v2.y)/2,(v1.z+v2.z)/2,1.0);
- //       v1v2b = true;
- //   }
-
-	//if ((v1.y <= h && v3.y >= h) || (v1.y >= h && v3.y <= h)){ // intersect v1->v3
-	//	v1v3 = findPlaneLineIntersectionPoint(v1, v3, h);
-	//	//v1v3 = vec4((v1.x+v3.x)/2,(v1.y+v3.y)/2,(v1.z+v3.z)/2,1.0);
- //       v1v3b = true;
- //   }
-
-	//if ((v2.y <= h && v3.y >= h) || (v2.y >= h && v3.y <= h)){ // intersect v2->v3
-	//	v2v3 = findPlaneLineIntersectionPoint(v2, v3, h);
-	//	//v2v3 = vec4((v2.x+v3.x)/2,(v2.y+v3.y)/2,(v2.z+v3.z)/2,1.0);
- //       v2v3b = true;
- //   }
-
-
-	//if(v1v2b && v1v3b){
-		
-	//	//p0 -> v1v2
-	//	GColor = (v1v2.y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	v1v2 = MVP * v1v2;
-	//	GNormal = VNormal[0];
- //       GPosition = vec3(v1v2);
- //       gl_Position = v1v2;
- //       EmitVertex();
- //       //p1 = v2
-	//	GColor = (WorldPosition[1].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	GNormal = VNormal[1];
- //       GPosition = VPosition[1];
- //       gl_Position = gl_in[1].gl_Position;
- //       EmitVertex();
- //       //p2 -> v1v3
-	//	GColor = (v1v3.y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	v1v3 = MVP * v1v3;
-	//	GNormal = VNormal[2];
- //       GPosition = vec3(v1v3);
- //       gl_Position = v1v3;
- //       EmitVertex();
- //   }
-
-	//else if(v1v2b && v2v3b){
- //       //p0 -> v1v2
-	//	GColor = (v1v2.y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	v1v2 = MVP * v1v2;
-	//	GNormal = VNormal[0];
- //       GPosition = vec3(v1v2);
- //       gl_Position = v1v2;
- //       EmitVertex();
- //       //p1 = v2
-	//	GColor = (WorldPosition[1].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	GNormal = VNormal[1];
- //       GPosition = VPosition[1];
- //       gl_Position = gl_in[1].gl_Position;
- //       EmitVertex();
- //       //p2 -> v2v3
-	//	GColor = (v2v3.y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	v2v3 = MVP * v2v3;
-	//	GNormal = VNormal[2];
- //       GPosition = vec3(v2v3);
- //       gl_Position = v2v3;
- //       EmitVertex();
- //   }
-
-	//	else if(v2v3b && v1v3b){
- //       //p0 -> v2v3
-	//	GColor = (v2v3.y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	v2v3 = MVP * v2v3;
-	//	GNormal = VNormal[0];
- //       GPosition = vec3(v2v3);
- //       gl_Position = v2v3;
- //       EmitVertex();
- //       //p1 = v3
-	//	GColor = (WorldPosition[2].y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	GNormal = VNormal[2];
- //       GPosition = VPosition[2];
- //       gl_Position = gl_in[2].gl_Position;
- //       EmitVertex();
- //       //p2 -> v1v3
-	//	GColor = (v1v3.y < h) ?  vec4( 1.0f,0.1f,0.0f, 1.0f ) : vec4( 0.0f,0.1f,1.0f, 1.0f );
-	//	v1v3 = MVP * v1v3;
-	//	GNormal = VNormal[2];
- //       GPosition = vec3(v1v3);
- //       gl_Position = v1v3;
- //       EmitVertex();
- //   }
-
 
 	EndPrimitive();
 }

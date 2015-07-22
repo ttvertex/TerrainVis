@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\HeightMap.cpp" />
     <ClCompile Include="src\gl_core_4_4.c" />
     <ClCompile Include="src\glutils.cpp" />
     <ClCompile Include="src\SceneBasic.cpp" />
     <ClCompile Include="src\glslprogram.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\VBOSphere.cpp" />
+    <ClCompile Include="src\ImageHeightMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="README.txt" />
@@ -19,7 +19,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\HeightMap.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\gl_core_4_4.h" />
     <ClInclude Include="src\glutils.h" />
@@ -27,6 +26,7 @@
     <ClInclude Include="src\glslprogram.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\VBOSphere.h" />
+    <ClInclude Include="src\ImageHeightMap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\levelCurve.frag">

@@ -10,7 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include "HeightMap.h"
+#include "ImageHeightMap.h"
 
 using std::string;
 using namespace std;
@@ -52,16 +52,17 @@ int main(int argc, char *argv[])
 {
 
 	// Initialize GLFW
-	if (!glfwInit()) exit(EXIT_FAILURE);
-	
+	if (!glfwInit()) 
+		exit(EXIT_FAILURE);
 
 	// Select OpenGL 4.3 with a forward compatible core profile.
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
 	
 	// Open the window
 	string title = "TerrainVis by tengel";
@@ -83,7 +84,7 @@ int main(int argc, char *argv[])
 	GLUtils::dumpGLInfo();
 
 	//scene = new SceneBasic(window);
-	scene = new HeightMap(window, "resources/terrain5.png");
+	scene = new ImageHeightMap(window, "resources/terrain.jpg");
 
 	// Initialization
 	initializeGL();
