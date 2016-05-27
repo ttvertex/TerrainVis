@@ -35,12 +35,6 @@
     <None Include="shader\levelCurve.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\basic.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\basic.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shader\levelCurve.geom">
       <Filter>shaders</Filter>
     </None>
